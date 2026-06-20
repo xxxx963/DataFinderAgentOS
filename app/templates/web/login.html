@@ -1,0 +1,58 @@
+{% extends "user_base.html" %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/user-style.css">
+{% end %}
+
+{% block body %}
+<div class="auth-page">
+    <div class="auth-container fade-in-up">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <div class="auth-logo-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h1 class="auth-title">智能数据助手</h1>
+                <p class="auth-subtitle">欢迎回来，请登录您的账户</p>
+            </div>
+            
+            {% if error %}
+            <div class="auth-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ error }}
+            </div>
+            {% end %}
+            
+            <form class="auth-form" method="post" action="/">
+                {% module xsrf_form_html() %}
+                <div class="auth-form-group">
+                    <label class="auth-label" for="username">
+                        <i class="fas fa-user me-1"></i>用户名
+                    </label>
+                    <input type="text" class="auth-input" id="username" name="username" required placeholder="请输入用户名">
+                </div>
+                <div class="auth-form-group">
+                    <label class="auth-label" for="password">
+                        <i class="fas fa-lock me-1"></i>密码
+                    </label>
+                    <input type="password" class="auth-input" id="password" name="password" required placeholder="请输入密码">
+                </div>
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-sign-in-alt me-2"></i>登录
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p class="auth-footer-text">
+                    还没有账户？<a href="/register" class="auth-footer-link">立即注册</a>
+                </p>
+            </div>
+            
+            <div class="auth-admin-link">
+                <a href="/admin/login">
+                    <i class="fas fa-shield-alt me-1"></i>管理员入口
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% end %}

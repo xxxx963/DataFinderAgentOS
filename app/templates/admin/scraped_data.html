@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.scraping-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+}
+
+.scraping-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+}
+
+.scraping-title {
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 200% center; }
+}
+
+.data-item {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.data-item:hover {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.data-item.selected {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.data-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px 0 0 6px;
+}
+
+.source-badge {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.deep-scraped-badge {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.not-deep-scraped-badge {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+    border: 1px solid rgba(156, 163, 175, 0.3);
+}
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="scraping-title">
+                            <i class="fas fa-warehouse me-2"></i>数据仓库
+                        </h2>
+                        <p class="text-muted mb-0">管理采集到的数据</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card scraping-bg border-0 rounded-3 p-4 mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <form method="get" class="d-flex">
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-800 border-slate-700 text-muted">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="keyword" class="form-control" 
+                                       placeholder="搜索标题、摘要或来源..." value="{{ keyword }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary ms-2">搜索</button>
+                            {% if keyword %}
+                            <a href="/admin/scraped-data" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% end %}
+                        </form>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-3">
+                            <span class="text-muted">共 {{ total }} 条数据</span>
+                            <button id="selectAllBtn" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-check-double me-1"></i>全选
+                            </button>
+                            <button id="deepScrapeBtn" class="btn btn-primary btn-sm">
+                                <i class="fas fa-search-plus me-1"></i>深度采集
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card scraping-card border-0 rounded-4">
+                <form id="dataForm" method="post" action="/admin/deep-scrape/execute">
+                    {% module xsrf_form_html() %}
+                    {% if data_list %}
+                    <div class="row g-3 p-4">
+                        {% for item in data_list %}
+                        <div class="col-md-6">
+                            <div class="data-item d-flex" data-id="{{ item['id'] }}">
+                                <div class="flex-shrink-0 p-3">
+                                    <input type="checkbox" class="data-checkbox form-check-input" name="data_ids" value="{{ item['id'] }}">
+                                </div>
+                                {% if item['image_url'] %}
+                                <div class="flex-shrink-0">
+                                    <img src="{{ item['image_url'] }}" class="data-image" alt="" onerror="this.style.display='none'">
+                                </div>
+                                {% end %}
+                                <div class="flex-grow-1 p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <a href="{{ item['url'] }}" target="_blank" class="h6 mb-0 text-white text-decoration-none text-truncate" style="max-width: 200px;">
+                                            {{ item['title'] }}
+                                        </a>
+                                        <div class="d-flex gap-2">
+                                            <span class="source-badge px-2 py-1 rounded text-xs">
+                                                {{ item['source_name'] if item['source_name'] else "未知" }}
+                                            </span>
+                                            {% if item['deep_scraped'] %}
+                                            <span class="deep-scraped-badge px-2 py-1 rounded text-xs">
+                                                <i class="fas fa-check-circle me-1"></i>已深度采集
+                                            </span>
+                                            {% else %}
+                                            <span class="not-deep-scraped-badge px-2 py-1 rounded text-xs">
+                                                <i class="fas fa-circle me-1"></i>未深度采集
+                                            </span>
+                                            {% end %}
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-2 text-truncate-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {{ item['summary'] if item['summary'] else "暂无摘要" }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-xs text-muted">
+                                            {{ item['created_at'] }}
+                                        </span>
+                                        <div class="btn-group btn-group-sm">
+                                            {% if item['deep_scraped'] %}
+                                            <a href="/admin/deep-scrape" class="btn btn-outline-success" title="查看深度采集结果">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% end %}
+                                            <form method="post" action="/admin/scraped-data/delete/{{ item['id'] }}" 
+                                                  onsubmit="return confirm('确定要删除这条数据吗？');" class="m-0">
+                                                {% module xsrf_form_html() %}
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% end %}
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-8">
+                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                        <div>暂无数据</div>
+                        <div class="text-sm">去瞭望采集页面采集数据吧</div>
+                    </div>
+                    {% end %}
+                </form>
+                
+                {% if show_pagination %}
+                <nav class="p-4 border-top border-slate-700">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                        <li class="page-item">
+                            <a class="page-link bg-slate-800 border-slate-700 text-white" 
+                               href="/admin/scraped-data?page={{ prev_page }}{% if keyword %}&keyword={{ keyword }}{% end %}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% end %}
+                        
+                        {% for p in page_numbers %}
+                        <li class="page-item">
+                            <a class="page-link bg-slate-800 border-slate-700 text-white {% if p == page %}active bg-purple-600{% end %}" 
+                               href="/admin/scraped-data?page={{ p }}{% if keyword %}&keyword={{ keyword }}{% end %}">
+                                {{ p }}
+                            </a>
+                        </li>
+                        {% end %}
+                        
+                        {% if has_next %}
+                        <li class="page-item">
+                            <a class="page-link bg-slate-800 border-slate-700 text-white" 
+                               href="/admin/scraped-data?page={{ next_page }}{% if keyword %}&keyword={{ keyword }}{% end %}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% end %}
+                    </ul>
+                </nav>
+                {% end %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deepScrapeBtn = document.getElementById('deepScrapeBtn');
+    const dataForm = document.getElementById('dataForm');
+    let allSelected = false;
+    
+    // 全选/取消全选
+    selectAllBtn.addEventListener('click', function() {
+        allSelected = !allSelected;
+        const checkboxes = document.querySelectorAll('.data-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = allSelected;
+            const item = checkbox.closest('.data-item');
+            if (item) {
+                item.classList.toggle('selected', allSelected);
+            }
+        });
+        selectAllBtn.innerHTML = allSelected ? 
+            '<i class="fas fa-times me-1"></i>取消全选' : 
+            '<i class="fas fa-check-double me-1"></i>全选';
+    });
+    
+    // 单个选择
+    document.querySelectorAll('.data-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const item = this.closest('.data-item');
+            if (item) {
+                item.classList.toggle('selected', this.checked);
+            }
+        });
+    });
+    
+    // 深度采集
+    deepScrapeBtn.addEventListener('click', async function() {
+        const selectedCheckboxes = document.querySelectorAll('.data-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('请先选择要深度采集的数据');
+            return;
+        }
+        
+        const confirmed = confirm(`确定要对选中的 ${selectedCheckboxes.length} 条数据进行深度采集吗？`);
+        if (!confirmed) return;
+        
+        const btn = this;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>采集中...';
+        btn.disabled = true;
+        
+        try {
+            const formData = new FormData(dataForm);
+            const response = await fetch('/admin/deep-scrape/execute', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(`深度采集完成！成功 ${result.success_count} 条，共 ${result.total} 条`);
+                window.location.reload();
+            } else {
+                alert('深度采集失败：' + (result.error || '未知错误'));
+            }
+        } catch (error) {
+            alert('深度采集过程中出错：' + error.message);
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    });
+});
+</script>
+{% end %}

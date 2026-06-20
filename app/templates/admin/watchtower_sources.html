@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .scraping-bg {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    }
+    
+    .scraping-card {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+    
+    .scraping-title {
+        background: linear-gradient(90deg, #a78bfa, #60a5fa);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-shift 3s ease infinite;
+    }
+    
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% center; }
+        50% { background-position: 200% center; }
+    }
+    
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        color: #e2e8f0;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: #8b5cf6;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        color: #e2e8f0;
+    }
+    
+    .scraping-btn {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.2));
+        border: 1px solid rgba(139, 92, 246, 0.5);
+        color: #c4b5fd;
+        transition: all 0.3s ease;
+    }
+    
+    .scraping-btn:hover {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.4));
+        border-color: #8b5cf6;
+        color: #e9d5ff;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    }
+    
+    .scraping-btn-primary {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        border: none;
+        color: white;
+    }
+    
+    .scraping-btn-primary:hover {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    
+    .status-enabled {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-disabled {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .action-icons {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .table-row:hover .action-icons {
+        opacity: 1;
+    }
+    
+    .copy-btn {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+        color: #8b5cf6;
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="scraping-title">
+                            <i class="fas fa-binoculars me-2"></i>瞭望源管理
+                        </h2>
+                        <p class="text-muted mb-0">管理数据采集源，配置采集规则</p>
+                    </div>
+                    <a href="/admin/watchtower-sources/new" class="btn scraping-btn-primary">
+                        <i class="fas fa-plus me-2"></i>新增采集源
+                    </a>
+                </div>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+            </div>
+            {% end %}
+            
+            <div class="content-card scraping-bg border-0 rounded-3 p-4 mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <form method="get" class="d-flex">
+                            <div class="input-group">
+                                <span class="input-group-text bg-slate-800 border-slate-700 text-muted">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="keyword" class="form-control" 
+                                       placeholder="搜索采集源名称或URL..." value="{{ keyword }}">
+                            </div>
+                            <button type="submit" class="btn scraping-btn ms-2">搜索</button>
+                            {% if keyword %}
+                            <a href="/admin/watchtower-sources" class="btn scraping-btn ms-2">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% end %}
+                        </form>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="text-muted">共 {{ total }} 个采集源</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card scraping-card border-0 rounded-4">
+                <div class="table-responsive">
+                    <table class="table text-white">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>名称</th>
+                                <th>URL</th>
+                                <th style="width: 100px;">方法</th>
+                                <th style="width: 100px;">状态</th>
+                                <th style="width: 150px;">创建时间</th>
+                                <th style="width: 120px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if sources %}
+                            {% for i, source in enumerate(sources) %}
+                            <tr class="table-row">
+                                <td>{{ i + 1 + (page - 1) * 20 }}</td>
+                                <td>
+                                    <div class="font-weight-bold">{{ source['name'] }}</div>
+                                    {% if source['description'] %}
+                                    <div class="text-muted small">{{ source['description'] }}</div>
+                                    {% end %}
+                                </td>
+                                <td>
+                                    <div class="text-truncate max-w-md" title="{{ source['url'] }}">
+                                        {{ source['url'] }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-slate-700">{{ source['method'] }}</span>
+                                </td>
+                                <td>
+                                    {% if source['enabled'] %}
+                                    <span class="status-badge status-enabled">
+                                        <i class="fas fa-check-circle me-1"></i>启用
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge status-disabled">
+                                        <i class="fas fa-times-circle me-1"></i>禁用
+                                    </span>
+                                    {% end %}
+                                </td>
+                                <td>{{ source['created_at'] }}</td>
+                                <td class="action-icons">
+                                    <div class="d-flex gap-2">
+                                        <a href="/admin/watchtower-sources/{{ source['id'] }}" class="btn scraping-btn btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="/admin/watchtower-sources/delete/{{ source['id'] }}" 
+                                              onsubmit="return confirm('确定要删除此采集源吗？');" class="m-0">
+                                            {% module xsrf_form_html() %}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% end %}
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-8">
+                                    <i class="fas fa-search fa-3x mb-3"></i>
+                                    <div>暂无采集源</div>
+                                    <div class="text-sm">点击上方按钮添加第一个采集源</div>
+                                </td>
+                            </tr>
+                            {% end %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if show_pagination %}
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                        <li class="page-item">
+                            <a class="page-link bg-slate-800 border-slate-700 text-white" 
+                               href="/admin/watchtower-sources?page={{ prev_page }}{% if keyword %}&keyword={{ keyword }}{% end %}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% end %}
+                        
+                        {% for p in page_numbers %}
+                        <li class="page-item">
+                            <a class="page-link bg-slate-800 border-slate-700 text-white {% if p == page %}active bg-purple-600{% end %}" 
+                               href="/admin/watchtower-sources?page={{ p }}{% if keyword %}&keyword={{ keyword }}{% end %}">
+                                {{ p }}
+                            </a>
+                        </li>
+                        {% end %}
+                        
+                        {% if has_next %}
+                        <li class="page-item">
+                            <a class="page-link bg-slate-800 border-slate-700 text-white" 
+                               href="/admin/watchtower-sources?page={{ next_page }}{% if keyword %}&keyword={{ keyword }}{% end %}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% end %}
+                    </ul>
+                </nav>
+                {% end %}
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}

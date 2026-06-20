@@ -1,0 +1,1092 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-blue: #6DB4E8;
+        --primary-pink: #F8B5D0;
+        --light-blue: #E8F4FC;
+        --light-pink: #FFF0F5;
+        --gradient-start: #A8D8EA;
+        --gradient-end: #F5B7D1;
+    }
+    
+    .page-header {
+        background: linear-gradient(90deg, var(--gradient-start) 0%, #C9A0DC 50%, var(--gradient-end) 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(168, 216, 234, 0.3);
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .search-bar {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E8F4FC;
+        border-radius: 8px;
+        background: var(--light-blue);
+        font-size: 0.875rem;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+    
+    .model-select {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E8F4FC;
+        border-radius: 8px;
+        background: white;
+        font-size: 0.875rem;
+        min-width: 150px;
+    }
+    
+    .btn-add {
+        background: var(--primary-pink);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .btn-add:hover {
+        background: #E89BC0;
+        transform: translateY(-1px);
+    }
+    
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .employee-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .employee-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .avatar {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--light-blue), var(--light-pink));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .card-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .employee-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.25rem;
+    }
+    
+    .model-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .card-description {
+        font-size: 0.875rem;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .card-properties {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .property-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        background: #F5F5F5;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        color: #666;
+    }
+    
+    .property-badge.enabled {
+        background: #E8F8E8;
+        color: #5CB85C;
+    }
+    
+    .property-badge.disabled {
+        background: #F8E8E8;
+        color: #D9534F;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #F0F0F0;
+    }
+    
+    .btn-edit, .btn-delete {
+        flex: 1;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        transition: all 0.2s;
+    }
+    
+    .btn-edit {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+    
+    .btn-edit:hover {
+        background: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-delete {
+        background: #F8E8E8;
+        color: #D9534F;
+    }
+    
+    .btn-delete:hover {
+        background: #D9534F;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-text {
+        color: #888;
+        margin-bottom: 1rem;
+    }
+    
+    .modal-overlay {
+        display: none !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 99999 !important;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.show {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .modal {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        z-index: 10000 !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #F0F0F0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+    }
+    
+    .btn-close:hover {
+        color: #666;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+    
+    .form-textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        min-height: 80px;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+    
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        box-sizing: border-box;
+    }
+    
+    .form-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+    
+    .form-switch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .switch-label {
+        font-size: 0.875rem;
+        color: #333;
+    }
+    
+    .switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.3s;
+        border-radius: 24px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-pink));
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+    
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #F0F0F0;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+    
+    .btn-cancel {
+        padding: 0.5rem 1.5rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        background: white;
+        color: #666;
+        transition: all 0.2s;
+    }
+    
+    .btn-cancel:hover {
+        background: #F5F5F5;
+    }
+    
+    .btn-save {
+        padding: 0.5rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-pink));
+        color: white;
+        transition: all 0.2s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    
+    .confirm-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        max-width: 400px;
+    }
+    
+    .confirm-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #F5A623;
+    }
+    
+    .confirm-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .confirm-text {
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+    
+    .confirm-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .btn-confirm {
+        padding: 0.5rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        background: #D9534F;
+        color: white;
+        transition: all 0.2s;
+    }
+    
+    .btn-confirm:hover {
+        background: #C9302C;
+    }
+    
+    .notification {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-size: 0.875rem;
+        z-index: 2000;
+        animation: slideIn 0.3s ease;
+        display: none;
+    }
+    
+    .notification.show {
+        display: block;
+    }
+    
+    .notification.success {
+        background: #5CB85C;
+    }
+    
+    .notification.error {
+        background: #D9534F;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 4rem;
+    }
+    
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #E0E0E0;
+        border-top: 4px solid var(--primary-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout" style="background: linear-gradient(180deg, #F0F8FF 0%, #FFF0F5 100%); min-height: 100vh;">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content" style="padding: 1.5rem;">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <span style="font-size: 1.25em;">🤖</span>
+                    数字员工管理
+                </h1>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="搜索员工名称...">
+                <select id="modelFilter" class="model-select">
+                    <option value="">全部模型引擎</option>
+                    <option value="默认模型">默认模型</option>
+                </select>
+                <button id="addBtn" class="btn-add">
+                    <i class="fas fa-plus"></i> 新增员工
+                </button>
+                <button id="testModalBtn" class="btn-add" style="margin-left: 10px;">
+                    <i class="fas fa-eye"></i> 测试弹窗
+                </button>
+            </div>
+            
+            <div id="cardsContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">新增数字员工</h3>
+                <button id="closeModal" class="btn-close" type="button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm" onsubmit="return false;">
+                    <input type="hidden" id="formId">
+                    <div class="form-group">
+                        <label class="form-label">名称 *</label>
+                        <input type="text" id="formName" class="form-input" required placeholder="请输入员工名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">功能简介</label>
+                        <textarea id="formDescription" class="form-textarea" placeholder="请输入功能描述"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">模型服务</label>
+                        <select id="formModelService" class="form-select">
+                            <option value="默认模型">默认模型</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-switch">
+                            <span class="switch-label">支持切换模型</span>
+                            <label class="switch">
+                                <input type="checkbox" id="formSwitchModel" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-switch">
+                            <span class="switch-label">支持播放音乐</span>
+                            <label class="switch">
+                                <input type="checkbox" id="formPlayMusic">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-switch">
+                            <span class="switch-label">支持查看历史</span>
+                            <label class="switch">
+                                <input type="checkbox" id="formViewHistory" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">头像图标</label>
+                        <input type="text" id="formAvatar" class="form-input" placeholder="输入emoji图标，如 🤖">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelBtn" class="btn-cancel" type="button">取消</button>
+                <button id="saveBtn" class="btn-save" type="button">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="confirmOverlay" class="modal-overlay">
+        <div class="confirm-modal">
+            <div class="confirm-icon">⚠️</div>
+            <h3 class="confirm-title">确认删除</h3>
+            <p class="confirm-text" id="confirmText">确定要删除数字员工吗？</p>
+            <div class="confirm-actions">
+                <button id="cancelDelete" class="btn-cancel">取消</button>
+                <button id="confirmDelete" class="btn-confirm">确定删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+    
+    loadEmployees();
+    
+    document.getElementById('searchInput').addEventListener('input', debounce(loadEmployees, 300));
+    document.getElementById('modelFilter').addEventListener('change', loadEmployees);
+    
+    // 新增员工按钮 - 添加更健壮的事件绑定
+    const addBtn = document.getElementById('addBtn');
+    console.log('Add button element:', addBtn);
+    if (addBtn) {
+        addBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Add button clicked');
+            openAddModal();
+        });
+    } else {
+        console.error('Add button not found!');
+    }
+    
+    // 全局点击日志
+    document.addEventListener('click', function(e) {
+        console.log('Global click event - target:', e.target);
+        console.log('Global click event - target class:', e.target.className);
+        console.log('Global click event - target id:', e.target.id);
+    }, true);
+    
+    document.getElementById('testModalBtn').addEventListener('click', function() {
+        console.log('Test modal button clicked');
+        const overlay = document.getElementById('modalOverlay');
+        console.log('Overlay element:', overlay);
+        console.log('Overlay current style:', overlay.style);
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        document.getElementById('modalTitle').textContent = '测试弹窗';
+        document.getElementById('formName').value = '测试员工';
+        document.getElementById('formDescription').value = '这是一个测试';
+    });
+    // 按钮事件绑定 - 使用事件委托确保弹窗内按钮能正确响应
+    document.addEventListener('click', function(e) {
+        const target = e.target;
+        
+        // 关闭弹窗按钮
+        if (target.id === 'closeModal' || target.closest('#closeModal')) {
+            e.preventDefault();
+            console.log('Close modal clicked');
+            closeModal();
+        }
+        
+        // 取消按钮
+        if (target.id === 'cancelBtn' || target.closest('#cancelBtn')) {
+            e.preventDefault();
+            console.log('Cancel button clicked');
+            closeModal();
+        }
+        
+        // 保存按钮
+        if (target.id === 'saveBtn' || target.closest('#saveBtn')) {
+            e.preventDefault();
+            console.log('Save button clicked');
+            saveEmployee();
+        }
+        
+        // 删除确认相关按钮
+        if (target.id === 'cancelDelete' || target.closest('#cancelDelete')) {
+            e.preventDefault();
+            console.log('Cancel delete clicked');
+            closeConfirm();
+        }
+        
+        if (target.id === 'confirmDelete' || target.closest('#confirmDelete')) {
+            e.preventDefault();
+            console.log('Confirm delete clicked');
+            deleteEmployee();
+        }
+        
+        // 编辑按钮 - 处理动态生成的卡片中的编辑按钮
+        const editBtn = target.closest('.btn-edit');
+        if (editBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = editBtn.getAttribute('data-id');
+            console.log('Edit button clicked for id:', id);
+            if (id) {
+                openEditModal(id);
+            }
+        }
+        
+        // 删除按钮 - 处理动态生成的卡片中的删除按钮
+        const deleteBtn = target.closest('.btn-delete');
+        if (deleteBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = deleteBtn.getAttribute('data-id');
+            const name = deleteBtn.getAttribute('data-name') || '员工';
+            console.log('Delete button clicked for id:', id, 'name:', name);
+            if (id) {
+                openDeleteConfirm(id, name);
+            }
+        }
+    });
+    
+    // 点击遮罩层关闭弹窗
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            console.log('Overlay clicked, closing modal');
+            closeModal();
+        }
+    });
+    document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            console.log('Confirm overlay clicked, closing');
+            closeConfirm();
+        }
+    });
+});
+
+let deleteId = null;
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification ${type} show`;
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+function loadEmployees() {
+    const search = document.getElementById('searchInput').value;
+    const model = document.getElementById('modelFilter').value;
+    
+    document.getElementById('cardsContainer').innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+    
+    fetch('/admin/digital-employee/api')
+        .then(res => res.json())
+        .then(data => {
+            let employees = data.data;
+            
+            if (search) {
+                employees = employees.filter(e => e.name.toLowerCase().includes(search.toLowerCase()));
+            }
+            if (model) {
+                employees = employees.filter(e => e.model_service === model);
+            }
+            
+            if (employees.length === 0) {
+                document.getElementById('cardsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🤖</div>
+                        <p class="empty-text">暂无数字员工，点击新增</p>
+                        <button id="addBtnEmpty" class="btn-add">
+                            <i class="fas fa-plus"></i> 新增员工
+                        </button>
+                    </div>
+                `;
+                document.getElementById('addBtnEmpty').addEventListener('click', openAddModal);
+            } else {
+                renderCards(employees);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showNotification('加载失败', 'error');
+        });
+}
+
+function renderCards(employees) {
+    let html = '';
+    employees.forEach(employee => {
+        html += `
+            <div class="employee-card" data-id="${employee.id}">
+                <div class="card-header">
+                    <div class="avatar">${employee.avatar || '🤖'}</div>
+                    <div class="card-info">
+                        <div class="employee-name">${employee.name}</div>
+                        <span class="model-tag">${employee.model_service}</span>
+                    </div>
+                </div>
+                <p class="card-description" title="${employee.description}">${employee.description}</p>
+                <div class="card-properties">
+                    <span class="property-badge ${employee.enable_switch_model ? 'enabled' : 'disabled'}">
+                        <i class="fas fa-refresh"></i>
+                        ${employee.enable_switch_model ? '支持切换' : '不支持切换'}
+                    </span>
+                    <span class="property-badge ${employee.enable_play_music ? 'enabled' : 'disabled'}">
+                        <i class="fas fa-music"></i>
+                        ${employee.enable_play_music ? '支持音乐' : '不支持音乐'}
+                    </span>
+                    <span class="property-badge ${employee.enable_view_history ? 'enabled' : 'disabled'}">
+                        <i class="fas fa-history"></i>
+                        ${employee.enable_view_history ? '支持历史' : '不支持历史'}
+                    </span>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-edit" type="button" data-id="${employee.id}">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                    <button class="btn-delete" type="button" data-id="${employee.id}" data-name="${employee.name}">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('cardsContainer').innerHTML = `<div class="cards-grid">${html}</div>`;
+}
+
+function openAddModal() {
+    console.log('openAddModal called');
+    
+    document.getElementById('modalTitle').textContent = '新增数字员工';
+    document.getElementById('formId').value = '';
+    document.getElementById('formName').value = '';
+    document.getElementById('formDescription').value = '';
+    document.getElementById('formModelService').value = '默认模型';
+    document.getElementById('formSwitchModel').checked = true;
+    document.getElementById('formPlayMusic').checked = false;
+    document.getElementById('formViewHistory').checked = true;
+    document.getElementById('formAvatar').value = '';
+    
+    const overlay = document.getElementById('modalOverlay');
+    console.log('Overlay element:', overlay);
+    
+    // 强制显示模态框
+    overlay.classList.add('show');
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    
+    // 确保模态框内容也正确显示
+    const modal = overlay.querySelector('.modal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+    }
+    
+    console.log('Overlay after show:', overlay.style);
+}
+
+function openEditModal(id) {
+    console.log('openEditModal called with id:', id);
+    
+    fetch('/admin/digital-employee/api')
+        .then(res => res.json())
+        .then(data => {
+            console.log('API response:', data);
+            const employee = data.data.find(e => String(e.id) === String(id));
+            console.log('Found employee:', employee);
+            
+            if (employee) {
+                document.getElementById('formId').value = employee.id;
+                document.getElementById('formName').value = employee.name;
+                document.getElementById('formDescription').value = employee.description;
+                document.getElementById('formModelService').value = employee.model_service;
+                document.getElementById('formSwitchModel').checked = employee.enable_switch_model === 1;
+                document.getElementById('formPlayMusic').checked = employee.enable_play_music === 1;
+                document.getElementById('formViewHistory').checked = employee.enable_view_history === 1;
+                document.getElementById('formAvatar').value = employee.avatar || '';
+                document.getElementById('modalTitle').textContent = '编辑数字员工';
+                
+                // 强制显示模态框
+                const overlay = document.getElementById('modalOverlay');
+                overlay.classList.add('show');
+                overlay.style.display = 'flex';
+                overlay.style.opacity = '1';
+                overlay.style.visibility = 'visible';
+                
+                // 确保模态框内容也正确显示
+                const modal = overlay.querySelector('.modal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                }
+                
+                console.log('Edit modal opened successfully');
+            } else {
+                showNotification('未找到该员工', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching employee:', err);
+            showNotification('加载员工信息失败', 'error');
+        });
+}
+
+function closeModal() {
+    console.log('closeModal called');
+    const overlay = document.getElementById('modalOverlay');
+    
+    // 移除show类并设置隐藏样式
+    overlay.classList.remove('show');
+    overlay.style.display = 'none';
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+    
+    // 确保模态框内容也隐藏
+    const modal = overlay.querySelector('.modal');
+    if (modal) {
+        modal.style.opacity = '0';
+    }
+    
+    console.log('Modal closed successfully');
+}
+
+function saveEmployee() {
+    const id = document.getElementById('formId').value;
+    const name = document.getElementById('formName').value;
+    
+    if (!name.trim()) {
+        showNotification('请输入员工名称', 'error');
+        return;
+    }
+    
+    const data = {
+        name: name,
+        description: document.getElementById('formDescription').value,
+        model_service: document.getElementById('formModelService').value,
+        enable_switch_model: document.getElementById('formSwitchModel').checked,
+        enable_play_music: document.getElementById('formPlayMusic').checked,
+        enable_view_history: document.getElementById('formViewHistory').checked,
+        avatar: document.getElementById('formAvatar').value
+    };
+    
+    let url = '/admin/digital-employee/api';
+    let method = 'POST';
+    
+    if (id) {
+        url = `/admin/digital-employee/api/${id}`;
+        method = 'PUT';
+    }
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.code === 0) {
+            showNotification(result.message);
+            closeModal();
+            loadEmployees();
+        } else {
+            showNotification(result.message, 'error');
+        }
+    })
+    .catch(err => {
+        showNotification('保存失败', 'error');
+    });
+}
+
+function openDeleteConfirm(id, name) {
+    deleteId = id;
+    document.getElementById('confirmText').textContent = `确定要删除数字员工「${name}」吗？`;
+    document.getElementById('confirmOverlay').classList.add('show');
+}
+
+function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('show');
+    deleteId = null;
+}
+
+function deleteEmployee() {
+    if (!deleteId) return;
+    
+    fetch(`/admin/digital-employee/api/${deleteId}`, {
+        method: 'DELETE'
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.code === 0) {
+            showNotification(result.message);
+            closeConfirm();
+            loadEmployees();
+        } else {
+            showNotification(result.message, 'error');
+        }
+    })
+    .catch(err => {
+        showNotification('删除失败', 'error');
+    });
+}
+
+</script>
+{% end %}

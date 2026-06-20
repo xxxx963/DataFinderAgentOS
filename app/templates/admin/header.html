@@ -1,0 +1,21 @@
+
+<header class="admin-header tech-header">
+    <div class="header-left">
+        <i class="fas fa-chart-line header-logo text-purple-400"></i>
+        <span class="header-title tech-heading">智能数据瞭望与智能问数系统</span>
+    </div>
+    <div class="header-right">
+        <div class="user-info d-flex align-items-center gap-3">
+            <div class="tech-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <span class="user-name text-light fw-semibold">{{ username }}</span>
+        </div>
+        <form method="post" action="/admin/logout" style="margin:0;">
+            {% module xsrf_form_html() %}
+            <button type="submit" class="btn btn-tech btn-tech-outline">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </form>
+    </div>
+</header>

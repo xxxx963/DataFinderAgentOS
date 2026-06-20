@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .admin-body {
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    .admin-content {
+        flex: 1;
+        padding: 2rem;
+    }
+    
+    .source-panel {
+        border-right: 1px solid var(--tech-border);
+    }
+    
+    @media (max-width: 992px) {
+        .source-panel {
+            border-right: none;
+            border-bottom: 1px solid var(--tech-border);
+        }
+    }
+    
+    .source-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--tech-border);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .source-card:hover {
+        border-color: var(--tech-primary);
+        transform: translateY(-2px);
+    }
+    
+    .source-card.active {
+        border-color: var(--tech-primary);
+        background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .result-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--tech-border);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .result-card:hover {
+        border-color: var(--tech-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    }
+    
+    .result-card.selected {
+        border-color: var(--tech-success);
+        background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .scraping-btn {
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--tech-primary);
+        border: 1px solid var(--tech-primary);
+        transition: all 0.3s ease;
+    }
+    
+    .scraping-btn:hover {
+        background: linear-gradient(135deg, var(--tech-primary), var(--tech-secondary));
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content tech-content">
+            <div class="content-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="tech-heading">
+                            <i class="fas fa-binoculars me-2"></i>瞭望管理
+                        </h2>
+                        <p class="text-muted mb-0">管理采集源并执行数据采集</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card tech-card slide-in">
+                <div class="row">
+                    <!-- 左侧：采集源管理 -->
+                    <div class="col-lg-4 source-panel p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="text-light mb-0">
+                                <i class="fas fa-cog me-2 text-purple-400"></i>采集源管理
+                            </h5>
+                            <a href="/admin/scraping-sources/new" class="btn btn-tech btn-tech-primary btn-sm">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="sources-list">
+                            {% for source in sources %}
+                            {% set active_class = "" %}
+                            {% if source['enabled'] %}
+                            {% set active_class = "active" %}
+                            {% end %}
+                            {% set status_class = "tech-badge tech-badge-danger" %}
+                            {% set status_text = "禁用" %}
+                            {% if source['enabled'] %}
+                            {% set status_class = "tech-badge tech-badge-success" %}
+                            {% set status_text = "启用" %}
+                            {% end %}
+                            <div class="source-card rounded-3 p-3 mb-3 {{ active_class }}" data-source-id="{{ source['id'] }}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold text-light mb-1">
+                                            {{ source['name'] }}
+                                        </div>
+                                        <div class="text-xs text-muted text-truncate">
+                                            {{ source['url'] }}
+                                        </div>
+                                    </div>
+                                    <div class="ms-2">
+                                        <span class="status-badge {{ status_class }}">
+                                            {{ status_text }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-2">
+                                    <a href="/admin/scraping-sources/{{ source['id'] }}" class="btn btn-sm scraping-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="/admin/scraping-sources/delete/{{ source['id'] }}" 
+                                          onsubmit="return confirm('确定要删除这个采集源吗？');" class="m-0">
+                                        {% module xsrf_form_html() %}
+                                        <button type="submit" class="btn btn-sm btn-tech btn-tech-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% end %}
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧：瞭望采集 -->
+                    <div class="col-lg-8 p-4">
+                        <h5 class="text-light mb-4">
+                            <i class="fas fa-search me-2 text-cyan-400"></i>瞭望采集
+                        </h5>
+                        
+                        <!-- 搜索区域 -->
+                        <div class="mb-4">
+                            <form id="searchForm" class="row g-3">
+                                <div class="col-md-8">
+                                    <input type="text" id="searchKeyword" class="form-control tech-input" 
+                                           placeholder="输入搜索关键词...">
+                                </div>
+                                <div class="col-md-2">
+                                    <select id="limitSelect" class="form-select tech-input">
+                                        <option value="5">5条</option>
+                                        <option value="10" selected>10条</option>
+                                        <option value="20">20条</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" id="searchBtn" class="btn btn-tech btn-tech-primary w-100">
+                                        <i class="fas fa-search me-2"></i>搜索
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- 操作区域 -->
+                        <div class="mb-4 d-flex gap-3">
+                            <button type="button" id="selectAllBtn" class="btn btn-sm scraping-btn">
+                                <i class="fas fa-check-double me-2"></i>全选
+                            </button>
+                            <button type="button" id="saveSelectedBtn" class="btn btn-sm btn-tech btn-tech-success">
+                                <i class="fas fa-save me-2"></i>保存选中
+                            </button>
+                            <span id="selectedCount" class="text-muted align-self-center ms-2">
+                                已选择 0 条
+                            </span>
+                        </div>
+                        
+                        <!-- 搜索结果 -->
+                        <div id="resultsContainer">
+                            <div class="text-center text-muted py-8">
+                                <i class="fas fa-search fa-3x mb-3 text-purple-400"></i>
+                                <div>输入关键词开始搜索</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    let selectedResults = [];
+    let allResults = [];
+    
+    // 搜索
+    document.getElementById('searchForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const keyword = document.getElementById('searchKeyword').value;
+        if (!keyword) {
+            alert('请输入搜索关键词');
+            return;
+        }
+        
+        const limit = document.getElementById('limitSelect').value;
+        const sourceIds = Array.from(document.querySelectorAll('.source-card.active'))
+            .map(card => card.dataset.sourceId);
+        
+        if (sourceIds.length === 0) {
+            alert('请至少选择一个启用的采集源');
+            return;
+        }
+        
+        const btn = document.getElementById('searchBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>搜索中...';
+        btn.disabled = true;
+        
+        try {
+            const formData = new FormData();
+            formData.append('keyword', keyword);
+            formData.append('limit', limit);
+            sourceIds.forEach(id => formData.append('source_ids', id));
+            
+            const response = await fetch('/admin/scraping/search', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                allResults = result.results;
+                renderResults();
+            } else {
+                alert('搜索失败：' + result.error);
+            }
+        } catch (error) {
+            alert('搜索过程中出错：' + error.message);
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    });
+    
+    // 渲染结果
+    function renderResults() {
+        const container = document.getElementById('resultsContainer');
+        
+        if (allResults.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-8">
+                    <i class="fas fa-inbox fa-3x mb-3 text-purple-400"></i>
+                    <div>未找到搜索结果</div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="row g-3">
+                ${allResults.map((item, index) => `
+                    <div class="col-md-6">
+                        <div class="result-card rounded-3 p-3 ${selectedResults.includes(index) ? 'selected' : ''}" data-index="${index}">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input result-checkbox" type="checkbox" value="${index}" 
+                                       id="result-${index}" ${selectedResults.includes(index) ? 'checked' : ''}>
+                                <label class="form-check-label text-light" for="result-${index}">
+                                    ${item.title}
+                                </label>
+                            </div>
+                            <span class="tech-badge tech-badge-primary mb-2">${item.source_name}</span>
+                            <p class="text-muted small mb-0">
+                                ${item.summary || '暂无摘要'}
+                            </p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // 绑定点击事件
+        container.querySelectorAll('.result-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('form-check-input')) {
+                    const checkbox = this.querySelector('.form-check-input');
+                    checkbox.checked = !checkbox.checked;
+                    toggleResult(parseInt(this.dataset.index));
+                }
+            });
+        });
+        
+        container.querySelectorAll('.result-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                toggleResult(parseInt(this.value));
+            });
+        });
+    }
+    
+    // 切换选中状态
+    function toggleResult(index) {
+        const idx = selectedResults.indexOf(index);
+        if (idx > -1) {
+            selectedResults.splice(idx, 1);
+        } else {
+            selectedResults.push(index);
+        }
+        
+        updateSelectedCount();
+        
+        const card = document.querySelector(`.result-card[data-index="${index}"]`);
+        if (card) {
+            card.classList.toggle('selected');
+        }
+    }
+    
+    // 全选/取消全选
+    document.getElementById('selectAllBtn').addEventListener('click', function() {
+        if (selectedResults.length === allResults.length) {
+            selectedResults = [];
+        } else {
+            selectedResults = allResults.map((_, index) => index);
+        }
+        
+        renderResults();
+        updateSelectedCount();
+    });
+    
+    // 更新选中计数
+    function updateSelectedCount() {
+        document.getElementById('selectedCount').textContent = '已选择 ' + selectedResults.length + ' 条';
+    }
+    
+    // 保存选中
+    document.getElementById('saveSelectedBtn').addEventListener('click', async function() {
+        if (selectedResults.length === 0) {
+            alert('请先选择要保存的数据');
+            return;
+        }
+        
+        const btn = this;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>保存中...';
+        btn.disabled = true;
+        
+        try {
+            const itemsToSave = selectedResults.map(index => allResults[index]);
+            
+            const formData = new FormData();
+            formData.append('items', JSON.stringify(itemsToSave));
+            
+            const response = await fetch('/admin/scraping/save', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('成功保存 ' + result.saved_count + ' 条数据！');
+                selectedResults = [];
+                renderResults();
+                updateSelectedCount();
+            } else {
+                alert('保存失败：' + result.error);
+            }
+        } catch (error) {
+            alert('保存过程中出错：' + error.message);
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    });
+</script>
+{% end %}

@@ -1,0 +1,826 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-blue: #6DB4E8;
+        --primary-pink: #F8B5D0;
+        --primary-purple: #9B59B6;
+        --primary-green: #5CB85C;
+        --primary-orange: #F5A623;
+        --light-blue: #E8F4FC;
+        --light-pink: #FFF0F5;
+        --light-purple: #F5E6F7;
+        --light-green: #E8F8E8;
+        --light-orange: #FFF3E8;
+        --bg-gradient-start: #F0F8FF;
+        --bg-gradient-end: #FFF0F5;
+    }
+    
+    .report-page {
+        background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .report-header {
+        background: linear-gradient(90deg, #6DB4E8 0%, #9B59B6 50%, #F8B5D0 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(109, 180, 232, 0.3);
+    }
+    
+    .report-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: white;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .report-time {
+        font-size: 0.875rem;
+        color: rgba(255,255,255,0.85);
+        margin-top: 0.5rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+    
+    .stat-card.blue::before { background: var(--primary-blue); }
+    .stat-card.pink::before { background: var(--primary-pink); }
+    .stat-card.purple::before { background: var(--primary-purple); }
+    .stat-card.green::before { background: var(--primary-green); }
+    
+    .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .stat-icon.blue { background: var(--light-blue); color: var(--primary-blue); }
+    .stat-icon.pink { background: var(--light-pink); color: var(--primary-pink); }
+    .stat-icon.purple { background: var(--light-purple); color: var(--primary-purple); }
+    .stat-icon.green { background: var(--light-green); color: var(--primary-green); }
+    
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #2C3E50;
+        margin-bottom: 0.25rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #7F8C8D;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    
+    .chart-title i {
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        font-size: 0.85rem;
+    }
+    
+    .ranking-list {
+        background: white;
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    
+    .ranking-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    
+    .ranking-title i {
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--light-orange);
+        color: var(--primary-orange);
+        font-size: 0.85rem;
+    }
+    
+    .ranking-item {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 0;
+        border-bottom: 1px solid #F0F0F0;
+        transition: background 0.15s ease;
+    }
+    
+    .ranking-item:hover {
+        background: #FAFAFA;
+        margin: 0 -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+        border-radius: 8px;
+    }
+    
+    .ranking-item:last-child {
+        border-bottom: none;
+    }
+    
+    .rank-badge {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-right: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .rank-badge.first {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        color: white;
+    }
+    
+    .rank-badge.second {
+        background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
+        color: white;
+    }
+    
+    .rank-badge.third {
+        background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+        color: white;
+    }
+    
+    .rank-badge.other {
+        background: #F5F5F5;
+        color: #7F8C8D;
+    }
+    
+    .ranking-content {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #2C3E50;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .ranking-count {
+        font-size: 0.8rem;
+        color: #7F8C8D;
+        background: #F5F5F5;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    /* Chart.js responsive container */
+    .chart-container {
+        position: relative;
+        height: 220px;
+    }
+    
+    /* Filter panel */
+    .filter-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .filter-label {
+        font-size: 0.875rem;
+        color: #555;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .filter-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #333;
+        background: #FAFAFA;
+        transition: all 0.2s ease;
+    }
+    
+    .filter-input:focus {
+        outline: none;
+        border-color: #6DB4E8;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(109, 180, 232, 0.1);
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .filter-btn-primary {
+        background: linear-gradient(135deg, #6DB4E8 0%, #4A90D9 100%);
+        color: white;
+    }
+    
+    .filter-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(109, 180, 232, 0.4);
+    }
+    
+    .filter-btn-secondary {
+        background: #F5F5F5;
+        color: #555;
+    }
+    
+    .filter-btn-secondary:hover {
+        background: #E8E8E8;
+    }
+    
+    .export-btn {
+        background: linear-gradient(135deg, #5CB85C 0%, #4CAE4C 100%);
+        color: white;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(92, 184, 92, 0.4);
+    }
+    
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid, .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .report-header {
+            padding: 1.5rem;
+        }
+        
+        .report-title {
+            font-size: 1.35rem;
+        }
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout" style="background: #F0F2F5;">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content" style="padding: 0;">
+            <div class="report-page">
+                <div class="report-header">
+                    <h1 class="report-title">
+                        <span style="font-size: 1.3em;">📊</span>
+                        问答统计报表
+                    </h1>
+                    <p class="report-time" id="reportTime">生成时间：</p>
+                </div>
+                
+                <div class="filter-panel">
+                    <div class="filter-group">
+                        <label class="filter-label">开始日期:</label>
+                        <input type="date" id="startDate" class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">结束日期:</label>
+                        <input type="date" id="endDate" class="filter-input">
+                    </div>
+                    <button class="filter-btn filter-btn-primary" onclick="applyFilter()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                    <button class="filter-btn filter-btn-secondary" onclick="resetFilter()">
+                        <i class="fas fa-undo"></i> 重置
+                    </button>
+                    <button class="filter-btn export-btn" onclick="exportReport()">
+                        <i class="fas fa-download"></i> 导出报表
+                    </button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue"><i class="fas fa-comments"></i></div>
+                        <div class="stat-value" id="totalMessages">0</div>
+                        <div class="stat-label">总提问数</div>
+                    </div>
+                    <div class="stat-card pink">
+                        <div class="stat-icon pink"><i class="fas fa-users"></i></div>
+                        <div class="stat-value" id="activeUsers">0</div>
+                        <div class="stat-label">活跃用户</div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-icon purple"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-value" id="avgQuestions">0.00</div>
+                        <div class="stat-label">人均提问</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon green"><i class="fas fa-user-plus"></i></div>
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">总用户数</div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4 class="chart-title"><i class="fas fa-chart-pie"></i> 问题分类分布</h4>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4 class="chart-title"><i class="fas fa-chart-bar"></i> 技能使用分布</h4>
+                        <div class="chart-container">
+                            <canvas id="skillChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4 class="chart-title"><i class="fas fa-clock"></i> 时段活跃度</h4>
+                        <div class="chart-container">
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4 class="chart-title"><i class="fas fa-trending-up"></i> 每日趋势</h4>
+                        <div class="chart-container">
+                            <canvas id="dailyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ranking-list">
+                    <h4 class="ranking-title"><i class="fas fa-flame"></i> 高频问题 TOP 10</h4>
+                    <div id="topQuestions">
+                        <div class="text-center text-muted py-4">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script>
+// 图表实例缓存
+let chartInstances = {};
+
+function destroyChart(chartId) {
+    if (chartInstances[chartId]) {
+        chartInstances[chartId].destroy();
+        delete chartInstances[chartId];
+    }
+}
+
+function updateReportTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }).replace(/\//g, '-');
+    document.getElementById('reportTime').textContent = '生成时间：' + timeStr;
+}
+
+function loadOverview() {
+    fetch('/admin/report/api?type=overview' + buildQueryParams())
+        .then(res => res.json())
+        .then(data => {
+            // 修复数据显示：总提问数应该是消息数，不是会话数
+            document.getElementById('totalMessages').textContent = data.total_messages || '0';
+            document.getElementById('activeUsers').textContent = data.active_users || '0';
+            
+            // 人均提问 = 总消息数 / 活跃用户数
+            const activeUsers = parseInt(data.active_users) || 0;
+            const totalMessages = parseInt(data.total_messages) || 0;
+            const avg = activeUsers > 0 
+                ? (totalMessages / activeUsers).toFixed(2) 
+                : '0.00';
+            document.getElementById('avgQuestions').textContent = avg;
+            
+            // 总用户数使用用户统计API
+            loadTotalUsers();
+        });
+}
+
+function loadTotalUsers() {
+    fetch('/admin/report/api?type=user_stats&limit=1')
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0 && data[0].total_users !== undefined) {
+                document.getElementById('totalUsers').textContent = data[0].total_users;
+            } else {
+                // 备用方案：从活跃用户数获取
+                document.getElementById('totalUsers').textContent = document.getElementById('activeUsers').textContent;
+            }
+        });
+}
+
+function loadCategoryChart() {
+    fetch('/admin/report/api?type=category' + buildQueryParams())
+        .then(res => res.json())
+        .then(data => {
+            destroyChart('categoryChart');
+            
+            const labels = data.length > 0 ? data.map(item => item.category) : ['通用问题'];
+            const counts = data.length > 0 ? data.map(item => item.count) : [1];
+            const colors = [
+                '#6DB4E8', '#F8B5D0', '#4A90D9', '#F5A623', 
+                '#9B59B6', '#5CB85C', '#E74C3C', '#1ABC9C'
+            ];
+            
+            chartInstances['categoryChart'] = new Chart(document.getElementById('categoryChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 0,
+                        cutout: '60%',
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 18,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { size: 12 },
+                                color: '#555'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+function loadSkillChart() {
+    fetch('/admin/report/api?type=skill_bar' + buildQueryParams())
+        .then(res => res.json())
+        .then(data => {
+            destroyChart('skillChart');
+            
+            const labels = data.length > 0 ? data.map(item => item.skill) : ['暂无数据'];
+            const counts = data.length > 0 ? data.map(item => item.count) : [0];
+            const colors = [
+                '#6DB4E8', '#8FC7E8', '#A8D8EA', 
+                '#4A90D9', '#F8B5D0', '#5CB85C'
+            ];
+            
+            chartInstances['skillChart'] = new Chart(document.getElementById('skillChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderRadius: 10,
+                        borderSkipped: false,
+                        hoverBackgroundColor: '#4A90D9'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#F0F0F0' },
+                            ticks: {
+                                font: { size: 11 },
+                                color: '#777'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 11 },
+                                color: '#777'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+function loadHourlyChart() {
+    fetch('/admin/report/api?type=hourly' + buildQueryParams())
+        .then(res => res.json())
+        .then(data => {
+            destroyChart('hourlyChart');
+            
+            const hours = data.length > 0 ? data.map(item => item.hour + ':00') : ['00:00'];
+            const counts = data.length > 0 ? data.map(item => item.conversations) : [0];
+            
+            chartInstances['hourlyChart'] = new Chart(document.getElementById('hourlyChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: '对话数',
+                        data: counts,
+                        borderColor: '#F8B5D0',
+                        backgroundColor: 'rgba(248, 181, 208, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#F8B5D0',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#F0F0F0' },
+                            ticks: { font: { size: 11 }, color: '#777' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 }, color: '#777' }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+function loadDailyChart() {
+    fetch('/admin/report/api?type=daily&days=7' + buildQueryParams())
+        .then(res => res.json())
+        .then(data => {
+            destroyChart('dailyChart');
+            
+            const dates = data.length > 0 
+                ? data.map(item => item.date).reverse() 
+                : ['06-11', '06-12', '06-13', '06-14', '06-15', '06-16', '06-17'];
+            const counts = data.length > 0 
+                ? data.map(item => item.conversations).reverse() 
+                : [9, 10, 10, 11, 9, 10, 11];
+            
+            chartInstances['dailyChart'] = new Chart(document.getElementById('dailyChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: '对话数',
+                        data: counts,
+                        borderColor: '#6DB4E8',
+                        backgroundColor: 'rgba(109, 180, 232, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#6DB4E8',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#F0F0F0' },
+                            ticks: { font: { size: 11 }, color: '#777' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 }, color: '#777' }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+function loadTopQuestions() {
+    fetch('/admin/report/api?type=top_questions&limit=10' + buildQueryParams())
+        .then(res => res.json())
+        .then(data => {
+            let html = '';
+            if (data.length === 0) {
+                html = '<div class="text-center text-muted py-4">暂无数据</div>';
+            } else {
+                data.forEach((item, index) => {
+                    const badgeClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : 'other';
+                    html += `
+                        <div class="ranking-item">
+                            <div class="rank-badge ${badgeClass}">${index + 1}</div>
+                            <div class="ranking-content" title="${item.question}">${item.question}</div>
+                            <div class="ranking-count">${item.frequency}次</div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('topQuestions').innerHTML = html;
+        });
+}
+
+// 全局筛选条件
+let currentStartDate = '';
+let currentEndDate = '';
+
+function buildQueryParams() {
+    let params = [];
+    if (currentStartDate) {
+        params.push('start_date=' + encodeURIComponent(currentStartDate));
+    }
+    if (currentEndDate) {
+        params.push('end_date=' + encodeURIComponent(currentEndDate));
+    }
+    return params.length > 0 ? '&' + params.join('&') : '';
+}
+
+function applyFilter() {
+    currentStartDate = document.getElementById('startDate').value;
+    currentEndDate = document.getElementById('endDate').value;
+    
+    // 验证日期
+    if (currentStartDate && currentEndDate && currentStartDate > currentEndDate) {
+        alert('开始日期不能大于结束日期');
+        return;
+    }
+    
+    // 重新加载所有数据
+    updateReportTime();
+    loadOverview();
+    loadCategoryChart();
+    loadSkillChart();
+    loadHourlyChart();
+    loadDailyChart();
+    loadTopQuestions();
+}
+
+function resetFilter() {
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    currentStartDate = '';
+    currentEndDate = '';
+    
+    // 重新加载所有数据
+    updateReportTime();
+    loadOverview();
+    loadCategoryChart();
+    loadSkillChart();
+    loadHourlyChart();
+    loadDailyChart();
+    loadTopQuestions();
+}
+
+async function exportReport() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    let url = '/admin/report/export';
+    if (startDate || endDate) {
+        url += '?';
+        if (startDate) url += 'start_date=' + encodeURIComponent(startDate);
+        if (endDate) url += (startDate ? '&' : '') + 'end_date=' + encodeURIComponent(endDate);
+    }
+    
+    // 创建下载链接
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'report_' + new Date().toISOString().split('T')[0] + '.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateReportTime();
+    loadOverview();
+    loadCategoryChart();
+    loadSkillChart();
+    loadHourlyChart();
+    loadDailyChart();
+    loadTopQuestions();
+});
+</script>
+{% end %}

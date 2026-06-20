@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <title>酷猫音乐天气</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mui@5.0.0/dist/css/mui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 首页 -->
+    <div id="home-page" class="mui-page mui-page-current">
+        <header class="mui-bar mui-bar-nav">
+            <h1 class="mui-title">酷猫音乐天气</h1>
+        </header>
+        
+        <div class="mui-content">
+            <div class="weather-home">
+                <!-- 搜索区域 -->
+                <div class="search-container">
+                    <input type="text" id="city-input" placeholder="输入城市名称（如：成都）" value="成都">
+                    <button class="search-btn" onclick="searchWeather()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <!-- 加载状态 -->
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p style="color: #fff; margin-top: 15px;">加载中...</p>
+                </div>
+                
+                <!-- 天气卡片 -->
+                <div id="weather-card" class="weather-card">
+                    <div class="weather-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="location-name">成都</span>
+                    </div>
+                    <div id="weather-icon" class="weather-icon"></div>
+                    <div class="weather-temp">
+                        <span id="temp-value">--</span><span>°C</span>
+                    </div>
+                    <div id="weather-desc" class="weather-desc">--</div>
+                    
+                    <!-- 天气详情 -->
+                    <div class="weather-details">
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <div id="humidity" class="detail-value">--%</div>
+                            <div class="detail-label">湿度</div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <div id="wind-speed" class="detail-value">--km/h</div>
+                            <div class="detail-label">风速</div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-eye"></i>
+                            <div id="visibility" class="detail-value">--km</div>
+                            <div class="detail-label">能见度</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 未来天气 -->
+                <div id="future-weather" class="future-weather">
+                    <h3><i class="fas fa-calendar-alt"></i> 未来天气预报</h3>
+                    <div id="future-list" class="future-list">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 悬浮音乐卡片 -->
+            <div class="music-float-card" onclick="openMusicPage()">
+                <div class="disc-container" id="mini-disc">
+                    <div class="disc-inner">
+                        <i class="fas fa-music" style="color: #fff; font-size: 20px;"></i>
+                    </div>
+                </div>
+                <div class="music-info">
+                    <div id="mini-title" class="music-title">选择歌曲播放</div>
+                    <div id="mini-artist" class="music-artist">点击打开音乐播放器</div>
+                </div>
+                <div class="music-controls">
+                    <button class="control-btn play-pause" id="mini-play-btn" onclick="event.stopPropagation(); miniPlayPause();">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 音乐页面 -->
+    <div id="music-page" class="mui-page">
+        <div class="music-page">
+            <div class="music-header">
+                <button onclick="closeMusicPage()">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <span style="color: #fff; font-size: 16px;">正在播放</span>
+                <button onclick="showPlaylist()">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+            
+            <div class="vinyl-area">
+                <div class="vinyl-disc" id="vinyl-disc">
+                    <div class="album-cover" id="album-cover">
+                        <div class="default-music-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="vinyl-center"></div>
+                </div>
+            </div>
+            
+            <div class="lyrics-area">
+                <p id="lyrics">♪ 享受音乐时光 ♪</p>
+            </div>
+            
+            <div class="playback-controls">
+                <div class="progress-area">
+                    <div class="progress-bar" onclick="seekProgress(event)">
+                        <div id="progress" class="progress"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="current-time">0:00</span>
+                        <span id="total-time">0:00</span>
+                    </div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="prev-btn" onclick="prevSong()">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="play-btn" id="main-play-btn" onclick="togglePlay()">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="next-btn" onclick="nextSong()">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="playlist-section" id="playlist-section">
+                <div class="playlist-title">
+                    <i class="fas fa-list"></i>
+                    <span>播放列表</span>
+                </div>
+                <ul class="playlist" id="playlist">
+                    <!-- 动态生成 -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 音频播放器 -->
+    <audio id="audio-player"></audio>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mui@5.0.0/dist/js/mui.min.js"></script>
+    <script>
+        // 全局变量
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        
+        // 音乐数据库
+        const musicDatabase = [
+            { name: "晴天", artist: "周杰伦", url: "https://music.163.com/song/media/outer/url?id=186166.mp3", cover: "sunny" },
+            { name: "稻香", artist: "周杰伦", url: "https://music.163.com/song/media/outer/url?id=186442.mp3", cover: "wheat" },
+            { name: "夜曲", artist: "周杰伦", url: "https://music.163.com/song/media/outer/url?id=186325.mp3", cover: "night" },
+            { name: "告白气球", artist: "周杰伦", url: "https://music.163.com/song/media/outer/url?id=413064714.mp3", cover: "love" },
+            { name: "七里香", artist: "周杰伦", url: "https://music.163.com/song/media/outer/url?id=186122.mp3", cover: "jasmine" },
+            { name: "成都", artist: "赵雷", url: "https://music.163.com/song/media/outer/url?id=436514312.mp3", cover: "chengdu" },
+            { name: "平凡之路", artist: "朴树", url: "https://music.163.com/song/media/outer/url?id=29785466.mp3", cover: "ordinary" },
+            { name: "起风了", artist: "买辣椒也用券", url: "https://music.163.com/song/media/outer/url?id=569918712.mp3", cover: "wind" },
+            { name: "往后余生", artist: "马良", url: "https://music.163.com/song/media/outer/url?id=554642327.mp3", cover: "余生" },
+            { name: "凉凉", artist: "杨宗纬&张碧晨", url: "https://music.163.com/song/media/outer/url?id=451302467.mp3", cover: "cold" }
+        ];
+        
+        // 音频播放器
+        const audioPlayer = document.getElementById('audio-player');
+        
+        // DOM元素
+        const elements = {
+            cityInput: document.getElementById('city-input'),
+            loading: document.getElementById('loading'),
+            weatherCard: document.getElementById('weather-card'),
+            locationName: document.getElementById('location-name'),
+            weatherIcon: document.getElementById('weather-icon'),
+            tempValue: document.getElementById('temp-value'),
+            weatherDesc: document.getElementById('weather-desc'),
+            humidity: document.getElementById('humidity'),
+            windSpeed: document.getElementById('wind-speed'),
+            visibility: document.getElementById('visibility'),
+            futureList: document.getElementById('future-list'),
+            miniTitle: document.getElementById('mini-title'),
+            miniArtist: document.getElementById('mini-artist'),
+            miniDisc: document.getElementById('mini-disc'),
+            miniPlayBtn: document.getElementById('mini-play-btn'),
+            vinylDisc: document.getElementById('vinyl-disc'),
+            albumCover: document.getElementById('album-cover'),
+            mainPlayBtn: document.getElementById('main-play-btn'),
+            progress: document.getElementById('progress'),
+            currentTime: document.getElementById('current-time'),
+            totalTime: document.getElementById('total-time'),
+            playlist: document.getElementById('playlist'),
+            playlistSection: document.getElementById('playlist-section')
+        };
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initMusicPlayer();
+            searchWeather();
+        });
+        
+        // 搜索天气
+        async function searchWeather() {
+            const city = elements.cityInput.value.trim();
+            if (!city) {
+                showToast('请输入城市名称');
+                return;
+            }
+            
+            elements.loading.style.display = 'flex';
+            elements.weatherCard.style.opacity = '0.5';
+            
+            try {
+                // 使用wttr.in API获取天气数据
+                const url = `https://wttr.in/${encodeURIComponent(city)}?format=j1&lang=zh`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    showToast('未找到该城市天气信息');
+                    return;
+                }
+                
+                updateWeatherUI(data, city);
+            } catch (error) {
+                console.error('天气获取失败:', error);
+                // 模拟数据
+                loadMockWeather(city);
+            }
+            
+            elements.loading.style.display = 'none';
+            elements.weatherCard.style.opacity = '1';
+        }
+        
+        // 更新天气UI
+        function updateWeatherUI(data, city) {
+            const current = data.current_condition[0];
+            
+            elements.locationName.textContent = city;
+            elements.tempValue.textContent = current.temp_C;
+            elements.weatherDesc.textContent = getWeatherDesc(current.weatherCode);
+            elements.humidity.textContent = current.humidity + '%';
+            elements.windSpeed.textContent = current.windspeedKmph + 'km/h';
+            elements.visibility.textContent = current.visibility + 'km';
+            
+            // 设置天气图标
+            const iconCode = current.weatherCode;
+            elements.weatherIcon.style.backgroundImage = `url(https://cdn.weatherapi.com/weather/128x128/${getWeatherIcon(iconCode)}.png)`;
+            
+            // 更新未来天气
+            updateFutureWeather(data.weather);
+        }
+        
+        // 获取天气描述
+        function getWeatherDesc(code) {
+            const weatherCodes = {
+                '113': '晴天',
+                '116': '多云',
+                '119': '阴天',
+                '122': '阴天',
+                '143': '雾',
+                '176': '阵雨',
+                '200': '雷暴',
+                '263': '小雨',
+                '266': '小雨',
+                '293': '阵雨',
+                '296': '雨',
+                '299': '中雨',
+                '302': '雷阵雨',
+                '305': '中雨',
+                '308': '大雨',
+                '311': '雨夹雪',
+                '314': '冻雨',
+                '317': '冻雨',
+                '320': '冰粒',
+                '323': '冰粒',
+                '326': '小冰雹',
+                '329': '小雪',
+                '332': '中雪',
+                '335': '大雪',
+                '338': '大雪',
+                '350': '冰雹',
+                '353': '小雨',
+                '356': '大雨',
+                '359': '暴雨',
+                '362': '阵雨夹雪',
+                '365': '小冰雹',
+                '368': '小雪',
+                '371': '阵雪',
+                '374': '冰粒',
+                '377': '冰粒',
+                '386': '雷阵雨',
+                '389': '雷暴雨',
+                '392': '阵雨',
+                '395': '大雪'
+            };
+            return weatherCodes[code] || '未知';
+        }
+        
+        // 获取天气图标
+        function getWeatherIcon(code) {
+            const icons = {
+                '113': 'sunny',
+                '116': 'partly-cloudy',
+                '119': 'cloudy',
+                '122': 'overcast',
+                '143': 'fog',
+                '176': 'rainy',
+                '200': 'thundery',
+                '263': 'rainy',
+                '266': 'rainy',
+                '293': 'rainy',
+                '296': 'rainy',
+                '299': 'rainy',
+                '302': 'rainy',
+                '305': 'rainy',
+                '308': 'rainy',
+                '320': 'sleet',
+                '329': 'snowy',
+                '332': 'snowy',
+                '335': 'snowy',
+                '338': 'snowy',
+                '350': 'sleet',
+                '353': 'rainy',
+                '356': 'rainy',
+                '359': 'rainy',
+                '386': 'thundery',
+                '389': 'thundery',
+                '392': 'rainy',
+                '395': 'snowy'
+            };
+            return icons[code] || 'sunny';
+        }
+        
+        // 更新未来天气
+        function updateFutureWeather(weather) {
+            let html = '';
+            const days = ['今天', '明天', '后天'];
+            
+            for (let i = 0; i < 3 && i < weather.length; i++) {
+                const day = weather[i];
+                const avgTemp = Math.round((parseInt(day.maxtempC) + parseInt(day.mintempC)) / 2);
+                html += `
+                    <div class="future-item">
+                        <div class="day">${days[i]}</div>
+                        <div class="icon" style="background-image: url(https://cdn.weatherapi.com/weather/64x64/${getWeatherIcon(day.hourly[4].weatherCode)}.png);"></div>
+                        <div class="temp">${day.mintempC}° - ${day.maxtempC}°</div>
+                    </div>
+                `;
+            }
+            elements.futureList.innerHTML = html;
+        }
+        
+        // 模拟天气数据
+        function loadMockWeather(city) {
+            elements.locationName.textContent = city;
+            elements.tempValue.textContent = '22';
+            elements.weatherDesc.textContent = '多云';
+            elements.humidity.textContent = '65%';
+            elements.windSpeed.textContent = '12km/h';
+            elements.visibility.textContent = '10km';
+            elements.weatherIcon.style.backgroundImage = 'url(https://cdn.weatherapi.com/weather/128x128/partly-cloudy.png)';
+            
+            elements.futureList.innerHTML = `
+                <div class="future-item">
+                    <div class="day">今天</div>
+                    <div class="icon" style="background-image: url(https://cdn.weatherapi.com/weather/64x64/partly-cloudy.png);"></div>
+                    <div class="temp">18° - 25°</div>
+                </div>
+                <div class="future-item">
+                    <div class="day">明天</div>
+                    <div class="icon" style="background-image: url(https://cdn.weatherapi.com/weather/64x64/sunny.png);"></div>
+                    <div class="temp">20° - 28°</div>
+                </div>
+                <div class="future-item">
+                    <div class="day">后天</div>
+                    <div class="icon" style="background-image: url(https://cdn.weatherapi.com/weather/64x64/rainy.png);"></div>
+                    <div class="temp">17° - 23°</div>
+                </div>
+            `;
+        }
+        
+        // Toast提示
+        function showToast(message) {
+            mui.toast(message);
+        }
+        
+        // ==================== 音乐播放器功能 ====================
+        
+        // 初始化音乐播放器
+        function initMusicPlayer() {
+            renderPlaylist();
+            
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('loadedmetadata', function() {
+                elements.totalTime.textContent = formatTime(audioPlayer.duration);
+            });
+            audioPlayer.addEventListener('ended', nextSong);
+        }
+        
+        // 渲染播放列表
+        function renderPlaylist() {
+            let html = '';
+            musicDatabase.forEach((song, index) => {
+                html += `
+                    <li class="playlist-item ${index === currentSongIndex ? 'active' : ''}" onclick="playSong(${index})">
+                        <span class="number">${index + 1}</span>
+                        <i class="fas fa-volume-up number playing"></i>
+                        <i class="fas fa-music music-icon"></i>
+                        <div class="info">
+                            <div class="song-title">${song.name}</div>
+                            <div class="artist">${song.artist}</div>
+                        </div>
+                        <span class="duration">--:--</span>
+                    </li>
+                `;
+            });
+            elements.playlist.innerHTML = html;
+        }
+        
+        // 播放歌曲
+        function playSong(index) {
+            currentSongIndex = index;
+            const song = musicDatabase[index];
+            
+            audioPlayer.src = song.url;
+            audioPlayer.play();
+            isPlaying = true;
+            
+            // 更新UI
+            updatePlayerUI();
+            showToast(`正在播放: ${song.name}`);
+        }
+        
+        // 更新播放器UI
+        function updatePlayerUI() {
+            const song = musicDatabase[currentSongIndex];
+            
+            // 更新迷你播放器
+            elements.miniTitle.textContent = song.name;
+            elements.miniArtist.textContent = song.artist;
+            
+            // 更新主播放器
+            elements.albumCover.innerHTML = `<div class="default-music-icon"><i class="fas fa-music"></i></div>`;
+            
+            // 更新播放按钮
+            updatePlayButtons();
+            
+            // 更新播放列表
+            document.querySelectorAll('.playlist-item').forEach((item, index) => {
+                item.classList.toggle('active', index === currentSongIndex);
+            });
+        }
+        
+        // 更新播放按钮状态
+        function updatePlayButtons() {
+            const iconClass = isPlaying ? 'fa-pause' : 'fa-play';
+            elements.miniPlayBtn.querySelector('i').className = `fas ${iconClass}`;
+            elements.mainPlayBtn.querySelector('i').className = `fas ${iconClass}`;
+            
+            // 更新唱片旋转
+            elements.miniDisc.classList.toggle('playing', isPlaying);
+            elements.vinylDisc.classList.toggle('playing', isPlaying);
+        }
+        
+        // 播放/暂停
+        function togglePlay() {
+            if (isPlaying) {
+                audioPlayer.pause();
+            } else {
+                audioPlayer.play();
+            }
+            isPlaying = !isPlaying;
+            updatePlayButtons();
+        }
+        
+        // 迷你播放器播放/暂停
+        function miniPlayPause() {
+            togglePlay();
+        }
+        
+        // 上一首
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + musicDatabase.length) % musicDatabase.length;
+            playSong(currentSongIndex);
+        }
+        
+        // 下一首
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % musicDatabase.length;
+            playSong(currentSongIndex);
+        }
+        
+        // 更新进度条
+        function updateProgress() {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            elements.progress.style.width = `${progress}%`;
+            elements.currentTime.textContent = formatTime(audioPlayer.currentTime);
+        }
+        
+        // 格式化时间
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // 进度条点击
+        function seekProgress(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            audioPlayer.currentTime = percent * audioPlayer.duration;
+        }
+        
+        // 打开音乐页面
+        function openMusicPage() {
+            document.getElementById('home-page').classList.remove('mui-page-current');
+            document.getElementById('music-page').classList.add('mui-page-current');
+        }
+        
+        // 关闭音乐页面
+        function closeMusicPage() {
+            document.getElementById('music-page').classList.remove('mui-page-current');
+            document.getElementById('home-page').classList.add('mui-page-current');
+        }
+        
+        // 显示/隐藏播放列表
+        function showPlaylist() {
+            elements.playlistSection.classList.toggle('show');
+        }
+        
+        // 回车搜索
+        elements.cityInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                searchWeather();
+            }
+        });
+    </script>
+</body>
+</html>

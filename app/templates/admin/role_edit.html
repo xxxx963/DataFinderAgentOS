@@ -1,0 +1,85 @@
+
+{% extends "base.html" %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>{% if role and role['id'] %}编辑角色{% else %}新增角色{% end %}</h2>
+                <a href="/admin/roles" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </a>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% end %}
+            
+            <div class="content-card">
+                <form method="post" action="{% if role and role['id'] %}/admin/roles/{{ role['id'] }}{% else %}/admin/roles/new{% end %}">
+                    {% module xsrf_form_html() %}
+                    
+                    <div class="form-group">
+                        <label for="name">角色名称 *</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="请输入角色名称" 
+                               value="{% if role %}{{ role['name'] or '' }}{% end %}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">描述</label>
+                        <textarea id="description" name="description" class="form-control" rows="3" placeholder="请输入描述">{% if role %}{{ role['description'] or '' }}{% end %}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>功能权限</label>
+                        <div class="function-tree">
+                            {% for func in all_functions %}
+                            {% if func['parent_id'] == 0 %}
+                            <div class="function-group">
+                                <div class="function-item">
+                                    <input type="checkbox" id="func_{{ func['id'] }}" name="function_ids" value="{{ func['id'] }}" 
+                                           {% if func['id'] in selected_funcs %}checked{% end %}>
+                                    <label for="func_{{ func['id'] }}">
+                                        <i class="{{ func['icon'] or 'fas fa-folder' }}"></i> {{ func['name'] }}
+                                    </label>
+                                </div>
+                                <div class="function-children">
+                                    {% for child in all_functions %}
+                                    {% if child['parent_id'] == func['id'] %}
+                                    <div class="function-item">
+                                        <input type="checkbox" id="func_{{ child['id'] }}" name="function_ids" value="{{ child['id'] }}" 
+                                               {% if child['id'] in selected_funcs %}checked{% end %}>
+                                        <label for="func_{{ child['id'] }}">
+                                            <i class="{{ child['icon'] or 'fas fa-file' }}"></i> {{ child['name'] }}
+                                        </label>
+                                    </div>
+                                    {% end %}
+                                    {% end %}
+                                </div>
+                            </div>
+                            {% end %}
+                            {% end %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/admin/roles" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> 取消
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}

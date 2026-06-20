@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .scraping-bg {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    }
+    
+    .scraping-card {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+    }
+    
+    .scraping-title {
+        background: linear-gradient(90deg, #a78bfa, #60a5fa);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-shift 3s ease infinite;
+    }
+    
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% center; }
+        50% { background-position: 200% center; }
+    }
+    
+    .form-control, .form-select, textarea {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        color: #e2e8f0;
+    }
+    
+    .form-control:focus, .form-select:focus, textarea:focus {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: #8b5cf6;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        color: #e2e8f0;
+    }
+    
+    textarea {
+        min-height: 150px;
+        font-family: monospace;
+    }
+    
+    .scraping-btn {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.2));
+        border: 1px solid rgba(139, 92, 246, 0.5);
+        color: #c4b5fd;
+        transition: all 0.3s ease;
+    }
+    
+    .scraping-btn:hover {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.4));
+        border-color: #8b5cf6;
+        color: #e9d5ff;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    }
+    
+    .scraping-btn-primary {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        border: none;
+        color: white;
+    }
+    
+    .scraping-btn-primary:hover {
+        background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+    }
+    
+    .url-hint {
+        background: rgba(139, 92, 246, 0.1);
+        border-left: 3px solid #8b5cf6;
+        padding: 10px 15px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: #c4b5fd;
+    }
+    
+    .headers-info {
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 3px solid #3b82f6;
+        padding: 10px 15px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: #93c5fd;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #475569;
+        transition: 0.4s;
+        border-radius: 34px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="scraping-title">
+                            <i class="fas fa-binoculars me-2"></i>{{ source['id'] if source else '新增' }}瞭望源
+                        </h2>
+                        <p class="text-muted mb-0">配置数据采集源信息</p>
+                    </div>
+                    <a href="/admin/watchtower-sources" class="btn scraping-btn">
+                        <i class="fas fa-arrow-left me-2"></i>返回列表
+                    </a>
+                </div>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+            </div>
+            {% end %}
+            
+            <div class="content-card scraping-bg border-0 rounded-3 p-4 mb-4">
+                <form method="post">
+                    {% module xsrf_form_html() %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-white">
+                                    <i class="fas fa-tag me-2"></i>采集源名称 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="name" class="form-control" 
+                                       value="{{ source['name'] if source else '' }}"
+                                       placeholder="请输入采集源名称">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label text-white">
+                                    <i class="fas fa-link me-2"></i>请求方法
+                                </label>
+                                <select name="method" class="form-select">
+                                    <option value="GET" {% if source and source['method'] == 'GET' %}selected{% end %}>GET</option>
+                                    <option value="POST" {% if source and source['method'] == 'POST' %}selected{% end %}>POST</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label text-white">
+                                    <i class="fas fa-toggle-on me-2"></i>启用状态
+                                </label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" name="enabled" value="1" 
+                                               {% if not source or source['enabled'] %}checked{% end %}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="text-muted">{{ '启用' if not source or source['enabled'] else '禁用' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-white">
+                                    <i class="fas fa-globe me-2"></i>采集URL <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="url" class="form-control" 
+                                       value="{{ source['url'] if source else '' }}"
+                                       placeholder="请输入采集URL">
+                                <div class="url-hint">
+                                    <strong>提示：</strong>URL中可使用 <code>{keyword}</code> 作为搜索关键词占位符，系统会自动替换
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label text-white">
+                                    <i class="fas fa-file-alt me-2"></i>描述
+                                </label>
+                                <textarea name="description" class="form-control" 
+                                          placeholder="请输入采集源描述">{{ source['description'] if source else '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-white">
+                            <i class="fas fa-code me-2"></i>Request Headers (JSON格式)
+                        </label>
+                        <textarea name="request_headers" class="form-control" 
+                                  placeholder='{"User-Agent": "Mozilla/5.0", "Accept": "*/*"}'>{{ json.dumps(source['request_headers'], indent=2) if source and source['request_headers'] else '' }}</textarea>
+                        <div class="headers-info">
+                            <strong>说明：</strong>请输入JSON格式的请求头，用于模拟浏览器请求。可从浏览器开发者工具中获取
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn scraping-btn-primary flex-1">
+                            <i class="fas fa-save me-2"></i>{{ '保存修改' if source else '创建采集源' }}
+                        </button>
+                        <a href="/admin/scraping-sources" class="btn scraping-btn">
+                            <i class="fas fa-times me-2"></i>取消
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="content-card scraping-card border-0 rounded-4">
+                <h3 class="text-white mb-3">
+                    <i class="fas fa-info-circle me-2"></i>采集源配置示例
+                </h3>
+                <div class="bg-slate-900 rounded-2 p-4 font-mono text-sm">
+                    <pre class="text-green-400">GET /s?wd={keyword}&pn=1 HTTP/1.1
+Host: www.baidu.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Accept: text/html,application/xhtml+xml
+Accept-Language: zh-CN,zh;q=0.9</pre>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}

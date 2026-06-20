@@ -1,0 +1,64 @@
+
+{% extends "base.html" %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>{% if user and user['id'] %}编辑用户{% else %}新增用户{% end %}</h2>
+                <a href="/admin/users" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </a>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% end %}
+            
+            <div class="content-card">
+                <form method="post" action="{% if user and user['id'] %}/admin/users/{{ user['id'] }}{% else %}/admin/users/new{% end %}">
+                    {% module xsrf_form_html() %}
+                    
+                    <div class="form-group">
+                        <label for="username">用户名 *</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名" 
+                               value="{% if user %}{{ user['username'] or '' }}{% end %}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">密码 {% if not user or not user['id'] %}*{% end %}</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="{% if user and user['id'] %}不修改请留空{% else %}请输入密码{% end %}" 
+                               {% if not user or not user['id'] %}required{% end %}>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="role_id">角色</label>
+                        <select id="role_id" name="role_id" class="form-control">
+                            <option value="">请选择角色</option>
+                            {% for r in roles %}
+                            <option value="{{ r['id'] }}" {% if user and user['role_id'] == r['id'] %}selected{% end %}>{{ r['name'] }}</option>
+                            {% end %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/admin/users" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> 取消
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}

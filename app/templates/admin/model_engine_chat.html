@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .cyber-bg {
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0f3460 100%);
+    }
+    
+    .cyber-card {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.1), inset 0 0 20px rgba(99, 102, 241, 0.05);
+        backdrop-filter: blur(10px);
+    }
+    
+    .cyber-title {
+        background: linear-gradient(90deg, #60a5fa, #a78bfa, #60a5fa);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-shift 3s ease infinite;
+    }
+    
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% center; }
+        50% { background-position: 200% center; }
+    }
+    
+    .chat-container {
+        height: calc(100vh - 300px);
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .chat-message {
+        margin-bottom: 1.5rem;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .user-avatar {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+    
+    .ai-avatar {
+        background: linear-gradient(135deg, #10b981, #34d399);
+    }
+    
+    .message-bubble {
+        max-width: 80%;
+        padding: 1rem 1.25rem;
+        border-radius: 1rem;
+        position: relative;
+    }
+    
+    .user-message .message-bubble {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        color: #e0e7ff;
+    }
+    
+    .ai-message .message-bubble {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        color: #e2e8f0;
+    }
+    
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 1rem 1.25rem;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6366f1;
+        animation: typingBounce 1.4s ease-in-out infinite;
+    }
+    
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typingBounce {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+    
+    .chat-input-container {
+        padding: 1rem;
+        border-top: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .chat-input {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #e2e8f0;
+    }
+    
+    .chat-input:focus {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: #6366f1;
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        color: #e2e8f0;
+    }
+    
+    .cyber-btn {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+        border: 1px solid rgba(99, 102, 241, 0.5);
+        color: #a5b4fc;
+        transition: all 0.3s ease;
+    }
+    
+    .cyber-btn:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
+        border-color: #6366f1;
+        color: #e0e7ff;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
+    
+    .cyber-btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        color: white;
+    }
+    
+    .cyber-btn-primary:hover {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+    }
+    
+    .cyber-btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .model-info-badge {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        color: #a5b4fc;
+    }
+    
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.3);
+        border-radius: 3px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.5);
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="cyber-title">
+                            <i class="fas fa-comments me-2"></i>模型测试
+                        </h2>
+                        <p class="text-muted mb-0">与 {{ model_engine.name }} ({{ model_engine.model_name }}) 进行对话</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge model-info-badge rounded-pill px-3 py-2">
+                            <i class="fas fa-cube me-1"></i>{{ model_engine.model_type }}
+                        </span>
+                        {% if model_engine.enable_sse %}
+                        <span class="badge model-info-badge rounded-pill px-3 py-2">
+                            <i class="fas fa-bolt me-1"></i>SSE
+                        </span>
+                        {% end %}
+                        <a href="/admin/model-engines" class="btn cyber-btn">
+                            <i class="fas fa-arrow-left me-2"></i>返回
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card cyber-card border-0 rounded-4 overflow-hidden">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message ai-message d-flex gap-3">
+                            <div class="message-avatar ai-avatar">
+                                <i class="fas fa-robot text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="message-bubble">
+                                    <h6 class="text-success mb-2">
+                                        <i class="fas fa-robot me-2"></i>{{ model_engine.name }}
+                                    </h6>
+                                    <p class="mb-0">你好！我是 {{ model_engine.name }}。有什么我可以帮助你的吗？</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <form id="chatForm" class="d-flex gap-2">
+                            <div class="flex-1">
+                                <input type="text" id="messageInput" class="form-control chat-input" 
+                                       placeholder="输入您的消息..." autocomplete="off">
+                            </div>
+                            <button type="submit" id="sendBtn" class="btn cyber-btn-primary px-4">
+                                <i class="fas fa-paper-plane me-2"></i>发送
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}
+
+{% block extra_js %}
+<script>
+    let isLoading = false;
+    let currentXhr = null;
+    let eventSource = null;
+    
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function addUserMessage(content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message user-message d-flex gap-3 justify-content-end';
+        messageDiv.innerHTML = `
+            <div class="flex-1 text-end">
+                <div class="message-bubble d-inline-block text-start">
+                    <h6 class="text-primary mb-2"><i class="fas fa-user me-2"></i>You</h6>
+                    <p class="mb-0">${escapeHtml(content)}</p>
+                </div>
+            </div>
+            <div class="message-avatar user-avatar">
+                <i class="fas fa-user text-white"></i>
+            </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    function addAiMessagePlaceholder() {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message ai-message d-flex gap-3';
+        messageDiv.id = 'aiMessagePlaceholder';
+        messageDiv.innerHTML = `
+            <div class="message-avatar ai-avatar">
+                <i class="fas fa-robot text-white"></i>
+            </div>
+            <div class="flex-1">
+                <div class="message-bubble">
+                    <h6 class="text-success mb-2"><i class="fas fa-robot me-2"></i>{{ model_engine.name }}</h6>
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+        return messageDiv;
+    }
+    
+    function updateAiMessage(content, isComplete = false) {
+        const placeholder = document.getElementById('aiMessagePlaceholder');
+        if (placeholder) {
+            const bubble = placeholder.querySelector('.message-bubble');
+            if (bubble) {
+                bubble.innerHTML = `
+                    <h6 class="text-success mb-2"><i class="fas fa-robot me-2"></i>{{ model_engine.name }}</h6>
+                    <p class="mb-0">${escapeHtml(content)}</p>
+                `;
+            }
+            if (isComplete) {
+                placeholder.id = '';
+            }
+        }
+        scrollToBottom();
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function setLoading(loading) {
+        isLoading = loading;
+        sendBtn.disabled = loading;
+        messageInput.disabled = loading;
+        if (loading) {
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>发送中...';
+        } else {
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>发送';
+        }
+    }
+    
+    function sendMessage(content) {
+        if (isLoading || !content.trim()) return;
+        
+        addUserMessage(content);
+        messageInput.value = '';
+        setLoading(true);
+        
+        const aiMessagePlaceholder = addAiMessagePlaceholder();
+        
+        {% if model_engine.enable_sse %}
+        // SSE Streaming
+        const formData = new FormData();
+        formData.append('message', content);
+        formData.append('_xsrf', getCookie('_xsrf'));
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/admin/model-engines/chat/{{ model_engine.id }}', true);
+        xhr.setRequestHeader('Accept', 'text/event-stream');
+        
+        let responseContent = '';
+        let buffer = '';
+        
+        xhr.onprogress = function() {
+            if (xhr.responseText) {
+                const newText = xhr.responseText.substring(buffer.length);
+                buffer = xhr.responseText;
+                
+                const lines = newText.split('\n');
+                for (let line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.substring(6));
+                            if (data.content) {
+                                responseContent += data.content;
+                                updateAiMessage(responseContent);
+                            }
+                            if (data.done) {
+                                updateAiMessage(responseContent, true);
+                                setLoading(false);
+                            }
+                        } catch (e) {
+                            // Ignore parsing errors
+                        }
+                    }
+                }
+            }
+        };
+        
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        updateAiMessage('抱歉，发生了错误：' + response.error, true);
+                    }
+                } catch (e) {
+                    updateAiMessage('抱歉，发生了错误，请稍后再试。', true);
+                }
+            }
+            setLoading(false);
+        };
+        
+        xhr.onerror = function() {
+            updateAiMessage('抱歉，发生了错误，请稍后再试。', true);
+            setLoading(false);
+        };
+        
+        xhr.send(formData);
+        {% else %}
+        // Normal Request
+        const formData = new FormData();
+        formData.append('message', content);
+        formData.append('_xsrf', getCookie('_xsrf'));
+        
+        fetch('/admin/model-engines/chat/{{ model_engine.id }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateAiMessage(data.content, true);
+            } else {
+                updateAiMessage('抱歉，发生了错误：' + (data.error || '未知错误'), true);
+            }
+        })
+        .catch(error => {
+            updateAiMessage('抱歉，发生了错误，请稍后再试。', true);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+        {% end %}
+    }
+    
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        sendMessage(messageInput.value);
+    });
+    
+    messageInput.focus();
+    
+    scrollToBottom();
+</script>
+{% end %}

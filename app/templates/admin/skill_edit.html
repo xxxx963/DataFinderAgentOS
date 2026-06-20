@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>{% if skill and skill['id'] %}编辑技能{% else %}新增技能{% end %}</h2>
+                <a href="/admin/skills" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </a>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% end %}
+            
+            <div class="content-card">
+                <form method="post" action="{% if skill and skill['id'] %}/admin/skills/{{ skill['id'] }}{% else %}/admin/skills/new{% end %}">
+                    {% module xsrf_form_html() %}
+                    
+                    <div class="form-group">
+                        <label for="skill_identifier">技能标识 *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">/</span>
+                            <input type="text" id="skill_identifier" name="skill_identifier" class="form-control" placeholder="如 search, sql, stat" 
+                                   value="{% if skill %}{{ skill['skill_identifier'] or '' }}{% end %}" 
+                                   {% if skill and skill['is_system'] == 1 %}readonly{% end %}
+                                   required>
+                        </div>
+                        <small class="form-text text-muted">技能的唯一指令触发名，如 /search 中的 "search"，系统内置技能不可修改</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">技能名称 *</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="请输入技能名称" 
+                               value="{% if skill %}{{ skill['name'] or '' }}{% end %}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">技能描述</label>
+                        <textarea id="description" name="description" class="form-control" rows="3" 
+                                  placeholder="请输入技能描述、功能说明、适用场景与使用示例">{% if skill %}{{ skill['description'] or '' }}{% end %}</textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="skill_type">技能类型</label>
+                            <select id="skill_type" name="skill_type" class="form-control" 
+                                    {% if skill and skill['is_system'] == 1 %}readonly{% end %}>
+                                <option value="system" {% if skill and skill['skill_type'] == 'system' %}selected{% end %}>系统技能</option>
+                                <option value="custom" {% if skill and skill['skill_type'] == 'custom' %}selected{% end %}>自定义技能</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="call_type">调用方式</label>
+                            <select id="call_type" name="call_type" class="form-control" 
+                                    {% if skill and skill['is_system'] == 1 %}readonly{% end %}>
+                                <option value="local" {% if skill and skill['call_type'] == 'local' %}selected{% end %}>本地逻辑执行</option>
+                                <option value="api" {% if skill and skill['call_type'] == 'api' %}selected{% end %}>第三方API对接</option>
+                                <option value="model_tool" {% if skill and skill['call_type'] == 'model_tool' %}selected{% end %}>大模型工具调用</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="sort_order">排序号</label>
+                            <input type="number" id="sort_order" name="sort_order" class="form-control" placeholder="数字越小越靠前" 
+                                   value="{% if skill %}{{ skill['sort_order'] or 0 }}{% else %}0{% end %}">
+                            <small class="form-text text-muted">控制前台指令联想提示的展示优先级</small>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="enabled">启用状态</label>
+                            <select id="enabled" name="enabled" class="form-control">
+                                <option value="1" {% if skill and skill['enabled'] == 1 %}selected{% end %}>启用</option>
+                                <option value="0" {% if skill and skill['enabled'] == 0 %}selected{% end %}>禁用</option>
+                            </select>
+                            <small class="form-text text-muted">关闭后前台无法触发该技能调度</small>
+                        </div>
+                    </div>
+                    
+                    {% if skill and skill['is_system'] == 1 %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>系统内置技能</strong>：此技能为系统内置技能，只能修改描述、启用状态和排序号。
+                    </div>
+                    {% end %}
+                    
+                    <div class="form-actions">
+                        <a href="/admin/skills" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> 取消
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}

@@ -1,0 +1,89 @@
+
+<aside class="admin-sidebar tech-sidebar">
+    <nav class="sidebar-menu">
+        <a href="/admin" class="tech-menu-item {% if request.path == '/admin' %}active{% end %}">
+            <i class="fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        
+        <div class="menu-group">
+            <div class="menu-group-title text-muted px-4 py-2 text-sm fw-bold">
+                <i class="fas fa-users-cog"></i>
+                <span>系统管理</span>
+            </div>
+            <a href="/admin/users" class="tech-menu-item {% if request.path.startswith('/admin/users') %}active{% end %}">
+                <i class="fas fa-user"></i>
+                <span>用户管理</span>
+            </a>
+            <a href="/admin/roles" class="tech-menu-item {% if request.path.startswith('/admin/roles') %}active{% end %}">
+                <i class="fas fa-user-tag"></i>
+                <span>角色管理</span>
+            </a>
+            <a href="/admin/functions" class="tech-menu-item {% if request.path.startswith('/admin/functions') %}active{% end %}">
+                <i class="fas fa-th-list"></i>
+                <span>功能管理</span>
+            </a>
+        </div>
+        
+        <div class="menu-group">
+            <div class="menu-group-title text-muted px-4 py-2 text-sm fw-bold">
+                <i class="fas fa-brain"></i>
+                <span>智能引擎</span>
+            </div>
+            <a href="/admin/model-engines" class="tech-menu-item {% if request.path.startswith('/admin/model-engines') %}active{% end %}">
+                <i class="fas fa-cogs"></i>
+                <span>模型引擎</span>
+            </a>
+            <a href="/admin/skills" class="tech-menu-item {% if request.path.startswith('/admin/skills') %}active{% end %}">
+                <i class="fas fa-toolbox"></i>
+                <span>技能仓库</span>
+            </a>
+            <a href="/admin/digital-employee" class="tech-menu-item {% if request.path.startswith('/admin/digital-employee') %}active{% end %}">
+                <i class="fas fa-robot"></i>
+                <span>数字员工</span>
+            </a>
+            <a href="/admin/report" class="tech-menu-item {% if request.path.startswith('/admin/report') %}active{% end %}">
+                <i class="fas fa-chart-bar"></i>
+                <span>问数报表统计</span>
+            </a>
+        </div>
+        
+        <div class="menu-group">
+            <div class="menu-group-title text-muted px-4 py-2 text-sm fw-bold">
+                <i class="fas fa-binoculars"></i>
+                <span>瞭望管理</span>
+            </div>
+            <a href="/admin/watchtower" class="tech-menu-item {% if request.path == '/admin/watchtower' %}active{% end %}">
+                <i class="fas fa-binoculars"></i>
+                <span>瞭望管理</span>
+            </a>
+            <a href="/admin/scraped-data" class="tech-menu-item {% if request.path.startswith('/admin/scraped-data') %}active{% end %}">
+                <i class="fas fa-warehouse"></i>
+                <span>数据仓库</span>
+            </a>
+            <a href="/admin/deep-scrape" class="tech-menu-item {% if request.path.startswith('/admin/deep-scrape') %}active{% end %}">
+                <i class="fas fa-search-plus"></i>
+                <span>深度采集</span>
+            </a>
+        </div>
+        
+        <div class="menu-group">
+            <div class="menu-group-title text-muted px-4 py-2 text-sm fw-bold">
+                <i class="fas fa-tv"></i>
+                <span>可视化</span>
+            </div>
+            <a href="#" class="tech-menu-item">
+                <i class="fas fa-chart-area"></i>
+                <span>智能大屏</span>
+            </a>
+            <a href="#" class="tech-menu-item">
+                <i class="fas fa-cube"></i>
+                <span>数字孪生</span>
+            </a>
+            <a href="#" class="tech-menu-item">
+                <i class="fas fa-desktop"></i>
+                <span>普通大屏</span>
+            </a>
+        </div>
+    </nav>
+</aside>

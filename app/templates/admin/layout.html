@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .admin-body {
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    .admin-content {
+        flex: 1;
+        padding: 2rem;
+    }
+    
+    .content-card {
+        background: var(--tech-bg-card);
+        border: 1px solid var(--tech-border);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+        backdrop-filter: blur(20px);
+    }
+    
+    .welcome-icon {
+        font-size: 4rem;
+        background: linear-gradient(135deg, var(--tech-primary), var(--tech-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content tech-content">
+            <div class="content-header mb-4">
+                <h2 class="tech-heading">欢迎使用</h2>
+                <p class="text-muted">智能数据瞭望与智能问数系统后台管理</p>
+            </div>
+            
+            <div class="content-card slide-in">
+                <div class="welcome-message text-center">
+                    <i class="fas fa-rocket welcome-icon mb-4"></i>
+                    <h3 class="fw-bold mb-3 text-light">欢迎回来，{{username}}</h3>
+                    <p class="text-muted mb-3">这是一个轻量级的智能数据采集、分析与问数综合业务系统，以大模型驱动整个业务系统的运行。</p>
+                    <p style="color: var(--tech-text-muted); font-size: 14px;">
+                        更多功能模块将在后续版本中推出...
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}

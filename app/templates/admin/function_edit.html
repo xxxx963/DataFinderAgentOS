@@ -1,0 +1,78 @@
+
+{% extends "base.html" %}
+
+{% block body %}
+<div class="admin-layout">
+    {% include "header.html" %}
+    
+    <div class="admin-body">
+        {% include "sidebar.html" %}
+        
+        <main class="admin-content">
+            <div class="content-header">
+                <h2>{% if func and func['id'] %}编辑功能{% else %}新增功能{% end %}</h2>
+                <a href="/admin/functions" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </a>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% end %}
+            
+            <div class="content-card">
+                <form method="post" action="{% if func and func['id'] %}/admin/functions/{{ func['id'] }}{% else %}/admin/functions/new{% end %}">
+                    {% module xsrf_form_html() %}
+                    
+                    <div class="form-group">
+                        <label for="name">功能名称 *</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="请输入功能名称" 
+                               value="{% if func %}{{ func['name'] or '' }}{% end %}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="icon">图标</label>
+                        <input type="text" id="icon" name="icon" class="form-control" placeholder="请输入图标，如 fas fa-home" 
+                               value="{% if func %}{{ func['icon'] or '' }}{% end %}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="path">路径</label>
+                        <input type="text" id="path" name="path" class="form-control" placeholder="请输入路径，如 /admin/users" 
+                               value="{% if func %}{{ func['path'] or '' }}{% end %}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parent_id">父级功能</label>
+                        <select id="parent_id" name="parent_id" class="form-control">
+                            <option value="0">顶级</option>
+                            {% for f in all_functions %}
+                            {% if f['parent_id'] == 0 %}
+                            <option value="{{ f['id'] }}" {% if func and func['parent_id'] == f['id'] %}selected{% end %}>{{ f['name'] }}</option>
+                            {% end %}
+                            {% end %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sort_order">排序</label>
+                        <input type="number" id="sort_order" name="sort_order" class="form-control" placeholder="请输入排序号" 
+                               value="{% if func %}{{ func['sort_order'] or 0 }}{% end %}">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/admin/functions" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> 取消
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+{% end %}
