@@ -13,63 +13,63 @@
     }
     
     .source-panel {
-        border-right: 1px solid var(--tech-border);
+        border-right: 1px solid var(--admin-border);
     }
     
     @media (max-width: 992px) {
         .source-panel {
             border-right: none;
-            border-bottom: 1px solid var(--tech-border);
+            border-bottom: 1px solid var(--admin-border);
         }
     }
     
     .source-card {
         background: rgba(15, 23, 42, 0.6);
-        border: 1px solid var(--tech-border);
-        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+        transition: all 0.2s ease;
         cursor: pointer;
     }
     
     .source-card:hover {
-        border-color: var(--tech-primary);
+        border-color: var(--admin-primary);
         transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
     
     .source-card.active {
-        border-color: var(--tech-primary);
-        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--admin-primary);
+        background: rgba(245, 158, 11, 0.08);
     }
     
     .result-card {
         background: rgba(15, 23, 42, 0.6);
-        border: 1px solid var(--tech-border);
-        transition: all 0.3s ease;
+        border: 1px solid var(--admin-border);
+        transition: all 0.2s ease;
         cursor: pointer;
     }
     
     .result-card:hover {
-        border-color: var(--tech-primary);
+        border-color: var(--admin-primary);
         transform: translateY(-2px);
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
     
     .result-card.selected {
-        border-color: var(--tech-success);
-        background: rgba(16, 185, 129, 0.1);
+        border-color: var(--admin-accent);
+        background: rgba(16, 185, 129, 0.08);
     }
     
     .scraping-btn {
-        background: rgba(99, 102, 241, 0.2);
-        color: var(--tech-primary);
-        border: 1px solid var(--tech-primary);
-        transition: all 0.3s ease;
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--admin-primary);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        transition: all 0.2s ease;
     }
     
     .scraping-btn:hover {
-        background: linear-gradient(135deg, var(--tech-primary), var(--tech-secondary));
-        border-color: transparent;
-        color: white;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        background: var(--admin-primary);
+        border-color: var(--admin-primary);
+        color: #0F172A;
     }
 </style>
 {% end %}
@@ -98,8 +98,8 @@
                     <!-- 左侧：采集源管理 -->
                     <div class="col-lg-4 source-panel p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="text-light mb-0">
-                                <i class="fas fa-cog me-2 text-purple-400"></i>采集源管理
+                            <h5 class="mb-0">
+                                <i class="fas fa-cog me-2 text-primary"></i>采集源管理
                             </h5>
                             <a href="/admin/scraping-sources/new" class="btn btn-tech btn-tech-primary btn-sm">
                                 <i class="fas fa-plus"></i>
@@ -121,7 +121,7 @@
                             <div class="source-card rounded-3 p-3 mb-3 {{ active_class }}" data-source-id="{{ source['id'] }}">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div class="flex-grow-1">
-                                        <div class="fw-bold text-light mb-1">
+                                        <div class="fw-bold mb-1">
                                             {{ source['name'] }}
                                         </div>
                                         <div class="text-xs text-muted text-truncate">
@@ -153,8 +153,8 @@
                     
                     <!-- 右侧：瞭望采集 -->
                     <div class="col-lg-8 p-4">
-                        <h5 class="text-light mb-4">
-                            <i class="fas fa-search me-2 text-cyan-400"></i>瞭望采集
+                        <h5 class="mb-4">
+                            <i class="fas fa-search me-2 text-primary"></i>瞭望采集
                         </h5>
                         
                         <!-- 搜索区域 -->
@@ -194,8 +194,8 @@
                         
                         <!-- 搜索结果 -->
                         <div id="resultsContainer">
-                            <div class="text-center text-muted py-8">
-                                <i class="fas fa-search fa-3x mb-3 text-purple-400"></i>
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-search fa-3x mb-3 text-primary"></i>
                                 <div>输入关键词开始搜索</div>
                             </div>
                         </div>
@@ -267,8 +267,8 @@
         
         if (allResults.length === 0) {
             container.innerHTML = `
-                <div class="text-center text-muted py-8">
-                    <i class="fas fa-inbox fa-3x mb-3 text-purple-400"></i>
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-inbox fa-3x mb-3 text-primary"></i>
                     <div>未找到搜索结果</div>
                 </div>
             `;
@@ -283,7 +283,7 @@
                             <div class="form-check mb-2">
                                 <input class="form-check-input result-checkbox" type="checkbox" value="${index}" 
                                        id="result-${index}" ${selectedResults.includes(index) ? 'checked' : ''}>
-                                <label class="form-check-label text-light" for="result-${index}">
+                                <label class="form-check-label" for="result-${index}">
                                     ${item.title}
                                 </label>
                             </div>

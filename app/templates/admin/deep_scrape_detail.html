@@ -2,46 +2,36 @@
 
 {% block extra_css %}
 <style>
-.deep-detail-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-}
-
-.deep-detail-card {
-    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
-}
-
 .section-card {
     background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    border: 1px solid var(--admin-border, rgba(245, 158, 11, 0.15));
     border-radius: 12px;
     padding: 20px;
 }
 
 .sentiment-positive {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
     border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .sentiment-negative {
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .sentiment-neutral {
-    background: rgba(156, 163, 175, 0.2);
-    color: #9ca3af;
-    border: 1px solid rgba(156, 163, 175, 0.3);
+    background: rgba(100, 116, 139, 0.15);
+    color: #94A3B8;
+    border: 1px solid rgba(100, 116, 139, 0.3);
 }
 
 .entity-tag {
     display: inline-block;
-    background: rgba(139, 92, 246, 0.2);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    color: #a78bfa;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #F59E0B;
     padding: 4px 12px;
     border-radius: 20px;
     margin: 4px;
@@ -49,8 +39,8 @@
 }
 
 .key-point {
-    background: rgba(139, 92, 246, 0.1);
-    border-left: 3px solid #8b5cf6;
+    background: rgba(245, 158, 11, 0.08);
+    border-left: 3px solid #F59E0B;
     padding: 12px 16px;
     border-radius: 8px;
     margin-bottom: 8px;
@@ -69,13 +59,13 @@
             <div class="content-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="text-white">
+                        <h2 class="tech-heading">
                             <i class="fas fa-search-plus me-2"></i>深度采集详情
                         </h2>
                         <p class="text-muted mb-0">{{ data.scraped_title or data.title }}</p>
                     </div>
                     <div>
-                        <a href="/admin/deep-scrape" class="btn btn-outline-secondary">
+                        <a href="/admin/deep-scrape" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-2"></i>返回列表
                         </a>
                     </div>
@@ -83,24 +73,24 @@
             </div>
             
             <!-- 基本信息 -->
-            <div class="content-card deep-detail-bg border-0 rounded-4 mb-4">
+            <div class="content-card rounded-4 mb-4">
                 <div class="p-4">
-                    <h5 class="text-white mb-3">
-                        <i class="fas fa-info-circle me-2 text-purple-400"></i>基本信息
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>基本信息
                     </h5>
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-3">
                                 <label class="text-muted small">标题</label>
-                                <div class="text-white">{{ data.scraped_title or data.title }}</div>
+                                <div>{{ data.scraped_title or data.title }}</div>
                             </div>
                             <div class="mb-3">
                                 <label class="text-muted small">来源</label>
-                                <div class="text-white">{{ data.source_name or '未知' }}</div>
+                                <div>{{ data.source_name or '未知' }}</div>
                             </div>
                             <div class="mb-3">
                                 <label class="text-muted small">链接</label>
-                                <a href="{{ data.url }}" target="_blank" class="text-purple-400 text-break">{{ data.url }}</a>
+                                <a href="{{ data.url }}" target="_blank" class="text-primary text-break">{{ data.url }}</a>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -121,7 +111,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="text-muted small">采集时间</label>
-                                <div class="text-white">{{ data.created_at }}</div>
+                                <div>{{ data.created_at }}</div>
                             </div>
                         </div>
                     </div>
@@ -129,10 +119,10 @@
             </div>
             
             <!-- 摘要 -->
-            <div class="content-card deep-detail-card border-0 rounded-4 mb-4">
+            <div class="content-card rounded-4 mb-4">
                 <div class="p-4">
-                    <h5 class="text-white mb-3">
-                        <i class="fas fa-file-alt me-2 text-purple-400"></i>摘要
+                    <h5 class="mb-3">
+                        <i class="fas fa-file-alt me-2 text-primary"></i>摘要
                     </h5>
                     <div class="section-card">
                         <p class="text-muted mb-0">{{ data.summary or '暂无摘要' }}</p>
@@ -141,10 +131,10 @@
             </div>
             
             <!-- 关键点 -->
-            <div class="content-card deep-detail-card border-0 rounded-4 mb-4">
+            <div class="content-card rounded-4 mb-4">
                 <div class="p-4">
-                    <h5 class="text-white mb-3">
-                        <i class="fas fa-star me-2 text-purple-400"></i>关键点
+                    <h5 class="mb-3">
+                        <i class="fas fa-star me-2 text-primary"></i>关键点
                     </h5>
                     <div class="section-card">
                         {% if data.key_points %}
@@ -171,10 +161,10 @@
             </div>
             
             <!-- 实体 -->
-            <div class="content-card deep-detail-card border-0 rounded-4 mb-4">
+            <div class="content-card rounded-4 mb-4">
                 <div class="p-4">
-                    <h5 class="text-white mb-3">
-                        <i class="fas fa-tags me-2 text-purple-400"></i>实体
+                    <h5 class="mb-3">
+                        <i class="fas fa-tags me-2 text-primary"></i>实体
                     </h5>
                     <div class="section-card">
                         {% if data.entities %}
@@ -183,7 +173,7 @@
                         {% if entities %}
                         {% for entity in entities %}
                         <span class="entity-tag">
-                            {% if entity.get('type') %}<span class="text-xs text-gray-400">{{ entity.type }}:</span>{% end %}
+                            {% if entity.get('type') %}<span class="text-xs text-muted">{{ entity.type }}:</span>{% end %}
                             {{ entity.get('name', entity) }}
                         </span>
                         {% end %}
@@ -201,10 +191,10 @@
             </div>
             
             <!-- 完整内容 -->
-            <div class="content-card deep-detail-card border-0 rounded-4 mb-4">
+            <div class="content-card rounded-4 mb-4">
                 <div class="p-4">
-                    <h5 class="text-white mb-3">
-                        <i class="fas fa-align-left me-2 text-purple-400"></i>完整内容
+                    <h5 class="mb-3">
+                        <i class="fas fa-align-left me-2 text-primary"></i>完整内容
                     </h5>
                     <div class="section-card">
                         <pre class="text-muted small mb-0" style="white-space: pre-wrap; word-wrap: break-word;">{{ data.full_text or data.raw_content or '暂无内容' }}</pre>
@@ -214,13 +204,13 @@
             
             <!-- 日志 -->
             {% if logs %}
-            <div class="content-card deep-detail-card border-0 rounded-4">
+            <div class="content-card rounded-4">
                 <div class="p-4">
-                    <h5 class="text-white mb-3">
-                        <i class="fas fa-history me-2 text-purple-400"></i>采集日志
+                    <h5 class="mb-3">
+                        <i class="fas fa-history me-2 text-primary"></i>采集日志
                     </h5>
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>时间</th>

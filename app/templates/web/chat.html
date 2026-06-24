@@ -3,16 +3,16 @@
 <link rel="stylesheet" href="/static/css/user-style.css">
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 <style>
-/* 音乐播放器样式 */
+/* 音乐播放器样式 - Midnight Observatory */
 .music-player-modal {
     position: fixed;
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%) translateY(100%);
-    background: linear-gradient(135deg, #E8F4FC, #FFF0F5);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
     border-radius: 24px;
     padding: 25px;
-    box-shadow: 0 20px 60px rgba(168, 216, 234, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     z-index: 1000;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
@@ -20,7 +20,8 @@
     width: 90%;
     max-width: 400px;
     max-height: 70vh;
-    border: 1px solid rgba(109, 180, 232, 0.3);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    backdrop-filter: blur(20px);
 }
 
 .music-player-modal.show {
@@ -32,13 +33,13 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    color: #333;
+    color: #F1F5F9;
 }
 
 .music-player-header h3 {
     font-size: 18px;
     font-weight: 600;
-    background: linear-gradient(135deg, #6DB4E8, #F8B5D0);
+    background: linear-gradient(135deg, #F59E0B, #3B82F6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -47,14 +48,14 @@
 .music-player-header button {
     background: transparent;
     border: none;
-    color: #666;
+    color: #94A3B8;
     font-size: 24px;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .music-player-header button:hover {
-    color: #6DB4E8;
+    color: #F59E0B;
 }
 
 .vinyl-area {
@@ -68,11 +69,11 @@
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #E8F4FC, #FFF0F5);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
     padding: 12px;
-    box-shadow: 0 10px 30px rgba(109, 180, 232, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     position: relative;
-    border: 2px solid rgba(109, 180, 232, 0.3);
+    border: 2px solid rgba(245, 158, 11, 0.2);
 }
 
 .vinyl-disc::before {
@@ -88,8 +89,8 @@
         circle,
         transparent,
         transparent 2px,
-        rgba(255, 255, 255, 0.03) 2px,
-        rgba(255, 255, 255, 0.03) 3px
+        rgba(245, 158, 11, 0.03) 2px,
+        rgba(245, 158, 11, 0.03) 3px
     );
 }
 
@@ -106,19 +107,19 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6DB4E8, #F8B5D0);
+    background: linear-gradient(135deg, #F59E0B, #3B82F6);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     z-index: 1;
-    box-shadow: inset 0 2px 10px rgba(109, 180, 232, 0.3);
+    box-shadow: inset 0 2px 10px rgba(245, 158, 11, 0.3);
 }
 
 .album-cover i {
     font-size: 35px;
-    color: rgba(255, 255, 255, 0.95);
-    filter: drop-shadow(0 2px 4px rgba(109, 180, 232, 0.3));
+    color: rgba(15, 23, 42, 0.95);
+    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
 }
 
 .vinyl-center {
@@ -128,10 +129,10 @@
     transform: translate(-50%, -50%);
     width: 22px;
     height: 22px;
-    background: linear-gradient(135deg, #fff, #e0e0e0);
+    background: linear-gradient(135deg, #1E293B, #0F172A);
     border-radius: 50%;
     z-index: 2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .vinyl-center::after {
@@ -142,21 +143,21 @@
     transform: translate(-50%, -50%);
     width: 6px;
     height: 6px;
-    background: #333;
+    background: #F59E0B;
     border-radius: 50%;
 }
 
 .song-info {
     text-align: center;
     margin-top: 15px;
-    color: #333;
+    color: #F1F5F9;
 }
 
 .song-title {
     font-size: 17px;
     font-weight: 600;
     margin-bottom: 4px;
-    background: linear-gradient(135deg, #6DB4E8, #F8B5D0);
+    background: linear-gradient(135deg, #F59E0B, #3B82F6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -164,7 +165,7 @@
 
 .song-artist {
     font-size: 13px;
-    color: rgba(102, 102, 102, 0.7);
+    color: #94A3B8;
 }
 
 .progress-area {
@@ -174,7 +175,7 @@
 .progress-bar {
     width: 100%;
     height: 4px;
-    background: rgba(109, 180, 232, 0.2);
+    background: rgba(245, 158, 11, 0.15);
     border-radius: 2px;
     position: relative;
     cursor: pointer;
@@ -182,7 +183,7 @@
 
 .progress {
     height: 100%;
-    background: linear-gradient(90deg, #6DB4E8, #F8B5D0);
+    background: linear-gradient(90deg, #F59E0B, #3B82F6);
     border-radius: 2px;
     width: 0%;
     position: relative;
@@ -196,9 +197,9 @@
     transform: translateY(-50%);
     width: 12px;
     height: 12px;
-    background: #fff;
+    background: #F1F5F9;
     border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
 .time-display {
@@ -206,7 +207,7 @@
     justify-content: space-between;
     margin-top: 10px;
     font-size: 12px;
-    color: rgba(102, 102, 102, 0.7);
+    color: #94A3B8;
 }
 
 .control-buttons {
@@ -219,13 +220,13 @@
 .control-buttons button {
     background: transparent;
     border: none;
-    color: rgba(109, 180, 232, 0.8);
+    color: rgba(245, 158, 11, 0.8);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .control-buttons button:hover {
-    color: #6DB4E8;
+    color: #F59E0B;
     transform: scale(1.1);
 }
 
@@ -242,18 +243,19 @@
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6DB4E8, #F8B5D0);
+    background: linear-gradient(135deg, #F59E0B, #3B82F6);
     font-size: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 15px rgba(109, 180, 232, 0.4);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    color: #0F172A;
 }
 
 .playlist-section {
     margin-top: 18px;
     padding-top: 15px;
-    border-top: 1px solid rgba(109, 180, 232, 0.2);
+    border-top: 1px solid rgba(245, 158, 11, 0.15);
     flex: 1;
     overflow: hidden;
 }
@@ -263,18 +265,18 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.6);
     border-radius: 12px;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .playlist-header:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.8);
 }
 
 .playlist-title {
-    color: #fff;
+    color: #F1F5F9;
     font-size: 14px;
     display: flex;
     align-items: center;
@@ -283,14 +285,14 @@
 
 .playlist-count {
     font-size: 12px;
-    color: rgba(255, 107, 157, 0.8);
-    background: rgba(255, 107, 157, 0.1);
+    color: #F59E0B;
+    background: rgba(245, 158, 11, 0.15);
     padding: 2px 8px;
     border-radius: 10px;
 }
 
 .playlist-toggle {
-    color: rgba(255, 255, 255, 0.6);
+    color: #94A3B8;
     font-size: 14px;
     transition: transform 0.3s ease;
 }
@@ -1124,7 +1126,7 @@
                     selectConversation(conv.id);
                 });
                 item.innerHTML = `
-                    <i class="fas fa-comment-alt"></i>
+                    <div class="conversation-item-icon"><i class="fas fa-comment-alt"></i></div>
                     <span>${conv.title || '新对话'}</span>
                 `;
                 list.appendChild(item);

@@ -2,30 +2,6 @@
 
 {% block extra_css %}
 <style>
-    .cyber-bg {
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0f3460 100%);
-    }
-    
-    .cyber-card {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.1), inset 0 0 20px rgba(99, 102, 241, 0.05);
-        backdrop-filter: blur(10px);
-    }
-    
-    .cyber-title {
-        background: linear-gradient(90deg, #60a5fa, #a78bfa, #60a5fa);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradient-shift 3s ease infinite;
-    }
-    
-    @keyframes gradient-shift {
-        0%, 100% { background-position: 0% center; }
-        50% { background-position: 200% center; }
-    }
-    
     .chat-container {
         height: calc(100vh - 300px);
         min-height: 400px;
@@ -52,7 +28,7 @@
     .message-avatar {
         width: 40px;
         height: 40px;
-        border-radius: 50%;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -60,7 +36,7 @@
     }
     
     .user-avatar {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: var(--admin-primary, #F59E0B);
     }
     
     .ai-avatar {
@@ -70,20 +46,19 @@
     .message-bubble {
         max-width: 80%;
         padding: 1rem 1.25rem;
-        border-radius: 1rem;
+        border-radius: 16px;
         position: relative;
     }
     
     .user-message .message-bubble {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
-        border: 1px solid rgba(99, 102, 241, 0.4);
-        color: #e0e7ff;
+        background: var(--admin-primary, #F59E0B);
+        color: #0F172A;
     }
     
     .ai-message .message-bubble {
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        color: #e2e8f0;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid var(--admin-border, rgba(245, 158, 11, 0.15));
+        color: var(--admin-text-primary, #F1F5F9);
     }
     
     .typing-indicator {
@@ -96,7 +71,7 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #6366f1;
+        background: var(--admin-primary, #F59E0B);
         animation: typingBounce 1.4s ease-in-out infinite;
     }
     
@@ -110,73 +85,27 @@
     
     .chat-input-container {
         padding: 1rem;
-        border-top: 1px solid rgba(99, 102, 241, 0.2);
+        border-top: 1px solid var(--admin-border, rgba(245, 158, 11, 0.15));
     }
     
     .chat-input {
         background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        color: #e2e8f0;
+        border: 1.5px solid var(--admin-border, rgba(245, 158, 11, 0.15));
+        color: var(--admin-text-primary, #F1F5F9);
+        border-radius: 12px;
     }
     
     .chat-input:focus {
         background: rgba(15, 23, 42, 0.95);
-        border-color: #6366f1;
-        box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-        color: #e2e8f0;
-    }
-    
-    .cyber-btn {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-        border: 1px solid rgba(99, 102, 241, 0.5);
-        color: #a5b4fc;
-        transition: all 0.3s ease;
-    }
-    
-    .cyber-btn:hover {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
-        border-color: #6366f1;
-        color: #e0e7ff;
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-    }
-    
-    .cyber-btn-primary {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        border: none;
-        color: white;
-    }
-    
-    .cyber-btn-primary:hover {
-        background: linear-gradient(135deg, #4f46e5, #7c3aed);
-        box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
-    }
-    
-    .cyber-btn-primary:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+        border-color: var(--admin-primary, #F59E0B);
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        color: var(--admin-text-primary, #F1F5F9);
     }
     
     .model-info-badge {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-        border: 1px solid rgba(99, 102, 241, 0.4);
-        color: #a5b4fc;
-    }
-    
-    .chat-messages::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .chat-messages::-webkit-scrollbar-track {
-        background: rgba(15, 23, 42, 0.5);
-    }
-    
-    .chat-messages::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.3);
-        border-radius: 3px;
-    }
-    
-    .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.5);
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: var(--admin-primary, #F59E0B);
     }
 </style>
 {% end %}
@@ -192,7 +121,7 @@
             <div class="content-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="cyber-title">
+                        <h2>
                             <i class="fas fa-comments me-2"></i>模型测试
                         </h2>
                         <p class="text-muted mb-0">与 {{ model_engine.name }} ({{ model_engine.model_name }}) 进行对话</p>
@@ -206,14 +135,14 @@
                             <i class="fas fa-bolt me-1"></i>SSE
                         </span>
                         {% end %}
-                        <a href="/admin/model-engines" class="btn cyber-btn">
+                        <a href="/admin/model-engines" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-2"></i>返回
                         </a>
                     </div>
                 </div>
             </div>
             
-            <div class="content-card cyber-card border-0 rounded-4 overflow-hidden">
+            <div class="content-card rounded-4 overflow-hidden">
                 <div class="chat-container">
                     <div class="chat-messages" id="chatMessages">
                         <div class="chat-message ai-message d-flex gap-3">
@@ -222,7 +151,7 @@
                             </div>
                             <div class="flex-1">
                                 <div class="message-bubble">
-                                    <h6 class="text-success mb-2">
+                                    <h6 class="mb-2" style="color: #059669;">
                                         <i class="fas fa-robot me-2"></i>{{ model_engine.name }}
                                     </h6>
                                     <p class="mb-0">你好！我是 {{ model_engine.name }}。有什么我可以帮助你的吗？</p>
@@ -237,7 +166,7 @@
                                 <input type="text" id="messageInput" class="form-control chat-input" 
                                        placeholder="输入您的消息..." autocomplete="off">
                             </div>
-                            <button type="submit" id="sendBtn" class="btn cyber-btn-primary px-4">
+                            <button type="submit" id="sendBtn" class="btn btn-primary px-4">
                                 <i class="fas fa-paper-plane me-2"></i>发送
                             </button>
                         </form>
@@ -270,7 +199,7 @@
         messageDiv.innerHTML = `
             <div class="flex-1 text-end">
                 <div class="message-bubble d-inline-block text-start">
-                    <h6 class="text-primary mb-2"><i class="fas fa-user me-2"></i>You</h6>
+                    <h6 class="mb-2" style="opacity:0.85;"><i class="fas fa-user me-2"></i>You</h6>
                     <p class="mb-0">${escapeHtml(content)}</p>
                 </div>
             </div>
@@ -292,7 +221,7 @@
             </div>
             <div class="flex-1">
                 <div class="message-bubble">
-                    <h6 class="text-success mb-2"><i class="fas fa-robot me-2"></i>{{ model_engine.name }}</h6>
+                    <h6 class="mb-2" style="color: #059669;"><i class="fas fa-robot me-2"></i>{{ model_engine.name }}</h6>
                     <div class="typing-indicator">
                         <div class="typing-dot"></div>
                         <div class="typing-dot"></div>
@@ -312,7 +241,7 @@
             const bubble = placeholder.querySelector('.message-bubble');
             if (bubble) {
                 bubble.innerHTML = `
-                    <h6 class="text-success mb-2"><i class="fas fa-robot me-2"></i>{{ model_engine.name }}</h6>
+                    <h6 class="mb-2" style="color: #059669;"><i class="fas fa-robot me-2"></i>{{ model_engine.name }}</h6>
                     <p class="mb-0">${escapeHtml(content)}</p>
                 `;
             }
@@ -350,7 +279,6 @@
         const aiMessagePlaceholder = addAiMessagePlaceholder();
         
         {% if model_engine.enable_sse %}
-        // SSE Streaming
         const formData = new FormData();
         formData.append('message', content);
         formData.append('_xsrf', getCookie('_xsrf'));
@@ -380,9 +308,7 @@
                                 updateAiMessage(responseContent, true);
                                 setLoading(false);
                             }
-                        } catch (e) {
-                            // Ignore parsing errors
-                        }
+                        } catch (e) {}
                     }
                 }
             }
@@ -409,7 +335,6 @@
         
         xhr.send(formData);
         {% else %}
-        // Normal Request
         const formData = new FormData();
         formData.append('message', content);
         formData.append('_xsrf', getCookie('_xsrf'));
@@ -447,7 +372,6 @@
     });
     
     messageInput.focus();
-    
     scrollToBottom();
 </script>
 {% end %}

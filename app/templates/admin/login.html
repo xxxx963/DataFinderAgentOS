@@ -17,32 +17,44 @@
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #06b6d4 0%, #f472b6 50%, #818cf8 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: #0F172A;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
         
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 30%, rgba(245, 158, 11, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
         }
         
         .login-container {
             width: 100%;
             max-width: 440px;
+            position: relative;
+            z-index: 1;
         }
         
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(245, 158, 11, 0.2);
             border-radius: 20px;
             padding: 3rem;
-            box-shadow: 0 25px 80px rgba(6, 182, 212, 0.25);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
         }
@@ -50,19 +62,11 @@
         .login-card::before {
             content: '';
             position: absolute;
-            inset: -3px;
-            background: linear-gradient(45deg, #06b6d4, #f472b6, #818cf8, #06b6d4);
-            background-size: 400% 400%;
-            border-radius: 22px;
-            z-index: -1;
-            opacity: 0.6;
-            animation: neonRotate 8s linear infinite;
-        }
-        
-        @keyframes neonRotate {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #F59E0B, #3B82F6, #10B981);
         }
         
         .login-header {
@@ -72,25 +76,20 @@
         
         .login-header .logo {
             font-size: 52px;
-            background: linear-gradient(135deg, #06b6d4, #f472b6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #F59E0B;
             margin-bottom: 16px;
         }
         
         .login-header h1 {
             font-size: 26px;
             font-weight: 700;
-            background: linear-gradient(135deg, #06b6d4, #f472b6, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #F1F5F9;
             margin-bottom: 8px;
+            font-family: 'Space Grotesk', sans-serif;
         }
         
         .login-header p {
-            color: #64748b;
+            color: #94A3B8;
             font-size: 14px;
         }
         
@@ -102,7 +101,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #475569;
+            color: #94A3B8;
             font-size: 14px;
         }
         
@@ -115,7 +114,7 @@
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
+            color: #64748B;
             font-size: 16px;
             z-index: 10;
         }
@@ -123,45 +122,50 @@
         .input-group .form-control {
             width: 100%;
             padding: 14px 16px 14px 48px;
-            border: 2px solid #e2e8f0;
+            border: 1.5px solid rgba(245, 158, 11, 0.2);
             border-radius: 12px;
             font-size: 15px;
-            background: #fafafa;
-            color: #1e293b;
-            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.8);
+            color: #F1F5F9;
+            transition: all 0.2s ease;
         }
         
         .input-group .form-control:focus {
-            border-color: #06b6d4;
-            box-shadow: 0 0 0 0.2rem rgba(6, 182, 212, 0.15);
-            background: white;
+            border-color: #F59E0B;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+            background: rgba(15, 23, 42, 0.95);
             outline: none;
+        }
+        
+        .input-group .form-control::placeholder {
+            color: #64748B;
         }
         
         .btn-login {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #06b6d4, #f472b6);
+            background: #F59E0B;
             border: none;
             border-radius: 12px;
-            color: white;
+            color: #0F172A;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
             margin-top: 8px;
+            font-family: 'Space Grotesk', sans-serif;
         }
         
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+            background: #D97706;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
         }
         
         .alert-error {
-            background: #fff0f0;
-            border: 1px solid #fecaca;
-            color: #dc2626;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #EF4444;
             padding: 12px 16px;
             border-radius: 10px;
             margin-bottom: 20px;
@@ -169,13 +173,13 @@
         }
         
         .slide-in {
-            animation: slideInUp 0.6s ease-out;
+            animation: slideInUp 0.4s ease-out;
         }
         
         @keyframes slideInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(16px);
             }
             to {
                 opacity: 1;

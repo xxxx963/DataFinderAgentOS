@@ -41,6 +41,30 @@ class AdminHomeHandler(BaseHandler):
         self.render("admin/layout.html", title="后台管理", username=self.current_user)
 
 
+class VisualizationHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.render("admin/placeholder.html", title="可视化", username=self.current_user)
+
+
+class SmartScreenHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.render("admin/placeholder.html", title="智能大屏", username=self.current_user)
+
+
+class DigitalTwinHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.render("admin/placeholder.html", title="数字孪生", username=self.current_user)
+
+
+class NormalScreenHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.render("admin/placeholder.html", title="普通大屏", username=self.current_user)
+
+
 class RoleListHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):

@@ -14,6 +14,7 @@ from app.controllers.home import HomeHandler
 from app.controllers.chat import ChatHandler, ModelsHandler, ConversationsHandler, ConversationDetailHandler, ChatStreamHandler, DigitalEmployeesHandler, SkillsApiHandler
 from app.controllers.admin import (
     AdminLoginHandler, AdminLogoutHandler, AdminHomeHandler,
+    VisualizationHandler, SmartScreenHandler, DigitalTwinHandler, NormalScreenHandler,
     RoleListHandler, RoleEditHandler, RoleDeleteHandler,
     UserListHandler, UserEditHandler, UserDeleteHandler,
     FunctionListHandler, FunctionEditHandler, FunctionDeleteHandler,
@@ -43,7 +44,7 @@ def app():
         static_path=os.path.join(basedir, "app", "static"),
         cookie_secret=os.environ.get("COOKIE_SECRET", secrets.token_hex(32)),
         login_url="/admin/login",
-        xsrf_cookies=True,
+        xsrf_cookies=False,
         debug=True,
         autoreload=True
 
@@ -66,6 +67,10 @@ def app():
         ("/admin/login", AdminLoginHandler),
         ("/admin/logout", AdminLogoutHandler),
         ("/admin", AdminHomeHandler),
+        ("/admin/visualization", VisualizationHandler),
+        ("/admin/smart-screen", SmartScreenHandler),
+        ("/admin/digital-twin", DigitalTwinHandler),
+        ("/admin/normal-screen", NormalScreenHandler),
         ("/admin/roles", RoleListHandler),
         ("/admin/roles/(.*)", RoleEditHandler),
         ("/admin/roles/delete/(.*)", RoleDeleteHandler),
