@@ -825,22 +825,36 @@ class ChatStreamHandler(BaseHandler):
             max_tokens = model_engine.get("max_tokens", 2048)
             
             if 'dashscope' in base_url or 'aliyuncs' in base_url:
-                url = base_url
-                headers = {
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json"
-                }
-                
-                data = {
-                    "model": model_name,
-                    "input": {
-                        "messages": messages
-                    },
-                    "parameters": {
+                if 'compatible-mode' in base_url:
+                    # OpenAI 兼容端点
+                    url = f"{base_url}/chat/completions"
+                    headers = {
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    data = {
+                        "model": model_name,
+                        "messages": messages,
                         "temperature": temperature,
                         "max_tokens": max_tokens
                     }
-                }
+                else:
+                    # DashScope 原生端点
+                    url = base_url
+                    headers = {
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    data = {
+                        "model": model_name,
+                        "input": {
+                            "messages": messages
+                        },
+                        "parameters": {
+                            "temperature": temperature,
+                            "max_tokens": max_tokens
+                        }
+                    }
             else:
                 url = f"{base_url}/chat/completions"
                 headers = {
@@ -864,10 +878,22 @@ class ChatStreamHandler(BaseHandler):
                 result = response.json()
                 
                 if 'dashscope' in base_url or 'aliyuncs' in base_url:
-                    if "output" not in result:
-                        error_msg = result.get("error", {}).get("message", "未知错误") if "error" in result else "API响应格式不正确"
-                        raise Exception(f"API响应不包含有效数据: {error_msg}")
-                    return result["output"].get("text", "")
+                    if 'compatible-mode' in base_url:
+                        # OpenAI 兼容端点响应格式
+                        if "choices" not in result or not result["choices"]:
+                            error_msg = result.get("error", {}).get("message", "未知错误") if "error" in result else "API响应格式不正确"
+                            raise Exception(f"API响应不包含有效数据: {error_msg}")
+                        if "message" not in result["choices"][0]:
+                            raise Exception("API响应格式不正确，缺少message字段")
+                        if "content" not in result["choices"][0]["message"]:
+                            raise Exception("API响应格式不正确，缺少content字段")
+                        return result["choices"][0]["message"]["content"]
+                    else:
+                        # DashScope 原生端点响应格式
+                        if "output" not in result:
+                            error_msg = result.get("error", {}).get("message", "未知错误") if "error" in result else "API响应格式不正确"
+                            raise Exception(f"API响应不包含有效数据: {error_msg}")
+                        return result["output"].get("text", "")
                 else:
                     if "choices" not in result or not result["choices"]:
                         error_msg = result.get("error", {}).get("message", "未知错误") if "error" in result else "API响应格式不正确"
